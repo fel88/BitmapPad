@@ -1,3 +1,4 @@
+using AutoDialog;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using System.Diagnostics;
@@ -12,6 +13,12 @@ namespace BitmapPad
             pictureBox1.MouseWheel += PictureBox1_MouseWheel;
             pictureBox1.MouseDown += PictureBox1_MouseDown;
             pictureBox1.MouseUp += PictureBox1_MouseUp;
+            FormClosing += Form1_FormClosing;
+        }
+
+        private void Form1_FormClosing(object? sender, FormClosingEventArgs e)
+        {
+            image.Dispose();
         }
 
         private void PictureBox1_MouseUp(object? sender, MouseEventArgs e)
@@ -66,7 +73,10 @@ namespace BitmapPad
         Mat image;
         public void Init(string path)
         {
-            image = OpenCvSharp.Cv2.ImRead(path);
+            //image = OpenCvSharp.Cv2.ImRead(path);
+            using (var stream = new FileStream(path, FileMode.Open)) {
+                image = Mat.FromStream(stream, ImreadModes.Unchanged);                
+            }
             var bmp = image.ToBitmap();
             pictureBox1.Image = bmp;
         }
@@ -140,10 +150,10 @@ namespace BitmapPad
             var d = AutoDialog.DialogHelpers.StartDialog();
             //InRangeS(imgHSV, cvScalar(20, 100, 100), cvScalar(30, 255, 255), imgThreshed)
             d.AddNumericField("r1", "red min", 20);
-            d.AddNumericField("r2", "red max", 30);
             d.AddNumericField("g1", "green min", 100);
-            d.AddNumericField("g2", "green max", 255);
             d.AddNumericField("b1", "blue min", 100);
+            d.AddNumericField("r2", "red max", 30);
+            d.AddNumericField("g2", "green max", 255);
             d.AddNumericField("b2", "blue max", 255);
             if (!d.ShowDialog())
                 return;
@@ -154,14 +164,86 @@ namespace BitmapPad
                 d.GetNumericField("g1"),
                 d.GetNumericField("b1")),
                 new Scalar(d.GetNumericField("r2"),
-                d.GetNumericField("g1"), d.GetNumericField("b2")));
-            mdi.MainForm.OpenChild(res);
+                d.GetNumericField("g2"), d.GetNumericField("b2")));
 
+            mdi.MainForm.OpenChild(res);
         }
 
         private void toolStripButton6_Click(object sender, EventArgs e)
         {
             MessageBox.Show("Resolution: " + image.Size() + Environment.NewLine + "Channels: " + image.Channels());
+        }
+
+        private void toolStripButton7_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStripButton8_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void extractToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (image.Channels() != 4)
+            {
+                MessageBox.Show("Image should contains 4 channels");
+                return;
+            }
+            var mats = image.Split();
+            mdi.MainForm.OpenChild(mats.Last());
+        }
+
+        private void removeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (image.Channels() != 4)
+            {
+                MessageBox.Show("Image should contains 4 channels");
+                return;
+            }
+            var mats = image.Split();
+            Mat res = new Mat();
+            Cv2.Merge(mats.Take(3).ToArray(), res);
+            mdi.MainForm.OpenChild(res);
+        }
+
+        private void toolStripButton7_Click_1(object sender, EventArgs e)
+        {
+            var mats = image.Split();
+            string[] names = new string[] { "red", "green", "blue", "alpha" };
+            for (int i = 0; i < mats.Length; i++)
+            {
+                Mat? item = mats[i];
+                mdi.MainForm.OpenChild(item, names[i]);
+            }
+        }
+
+        private void blurToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var d = DialogHelpers.StartDialog();
+            d.AddNumericField("s", "Size", 5);
+            if (!d.ShowDialog()) 
+                return;
+
+            mdi.MainForm.OpenChild(image.Blur(new OpenCvSharp.Size(d.GetNumericField("s"), d.GetNumericField("s"))));
+        }
+
+        private void bniarizeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var d = DialogHelpers.StartDialog();
+            d.AddNumericField("min", "Minimum", 128);
+            d.AddNumericField("max", "Maximum", 255);
+            if (!d.ShowDialog())
+                return;
+
+            Mat res = null;
+            if (image.Channels() == 1)
+                res = image.Threshold(d.GetNumericField("min"), d.GetNumericField("max"), ThresholdTypes.Binary);
+            else
+                res = image.CvtColor(ColorConversionCodes.BGR2GRAY).Threshold(d.GetNumericField("min"), d.GetNumericField("max"), ThresholdTypes.Binary);
+            mdi.MainForm.OpenChild(res);
+
         }
     }
 }

@@ -22,9 +22,13 @@ namespace BitmapPad
 
         public static mdi MainForm;
 
-        public void OpenChild(Mat mat)
+        public void OpenChild(Mat mat, string text = null)
         {
             Form1 f = new Form1();
+            if (text != null)
+            {
+                f.Text = text;
+            }
             f.MdiParent = this;
             f.Init(mat);
             f.Show();
@@ -40,7 +44,29 @@ namespace BitmapPad
             f.MdiParent = this;
             f.Init(ofd.FileName);
             f.Show();
-            
+
+        }
+
+        private void cascadeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LayoutMdi(MdiLayout.Cascade);
+        }
+
+        private void tileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LayoutMdi(MdiLayout.TileVertical);
+        }
+
+        private void horizontalToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LayoutMdi(MdiLayout.TileHorizontal);
+
+        }
+
+        private void arrangeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            LayoutMdi(MdiLayout.ArrangeIcons);
+
         }
     }
 }
