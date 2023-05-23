@@ -1,7 +1,10 @@
 using AutoDialog;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
+using OpenCvSharp.XPhoto;
 using System.Diagnostics;
+using System.IO.Packaging;
+using static System.Windows.Forms.AxHost;
 
 namespace BitmapPad
 {
@@ -24,58 +27,134 @@ namespace BitmapPad
         private void PictureBox1_MouseUp(object? sender, MouseEventArgs e)
         {
             drag = false;
+
+            var p = pictureBox1.PointToClient(Cursor.Position);
+            var pos = pictureBox1.PointToClient(Cursor.Position);
+            var posx = (pos.X / zoom - sx);
+            var posy = (-pos.Y / zoom - sy);
         }
 
         bool drag = false;
+
         private void PictureBox1_MouseDown(object? sender, MouseEventArgs e)
         {
             var pos = pictureBox1.PointToClient(Cursor.Position);
-            startDragPos = pos;
-            startDragShift = new PointF(shiftX, shiftY);
-            drag = true;
+            var p = Transform(pos);
+
+            if (e.Button == MouseButtons.Left)
+            {
+                drag = true;
+                startx = pos.X;
+                starty = pos.Y;
+                origsx = sx;
+                origsy = sy;
+            }
         }
 
+        float startx, starty;
+        float origsx, origsy;
         private void PictureBox1_MouseWheel(object? sender, MouseEventArgs e)
         {
-            if (e.Delta > 0)
-                scale *= 1.2f;
-            else
-                scale /= 1.2f;
+
+            float zold = zoom;
+            if (e.Delta > 0) { zoom *= 1.5f; ; }
+            else { zoom *= 0.5f; }
+            if (zoom < 0.08) { zoom = 0.08f; }
+            if (zoom > 1000) { zoom = 1000f; }
+
+            var pos = pictureBox1.PointToClient(Cursor.Position);
+
+            sx = -(pos.X / zold - sx - pos.X / zoom);
+            sy = (pos.Y / zold + sy - pos.Y / zoom);
         }
 
         float shiftX;
         float shiftY;
-        PointF startDragPos;
-        PointF startDragShift;
 
-        float scale = 1.0f;
+
+
         private void PictureBox1_Paint(object? sender, PaintEventArgs e)
         {
             var pos = pictureBox1.PointToClient(Cursor.Position);
 
+
             if (drag)
             {
-                shiftX = startDragShift.X + pos.X - startDragPos.X;
-                shiftY = startDragShift.Y + pos.Y - startDragPos.Y;
+                var p = pictureBox1.PointToClient(Cursor.Position);
+
+                sx = origsx + ((p.X - startx) / zoom);
+                sy = origsy + (-(p.Y - starty) / zoom);
             }
             var bmp = image.ToBitmap();
             var gr = e.Graphics;
             gr.Clear(Color.White);
-            gr.ResetTransform();
-            gr.TranslateTransform(shiftX, shiftY);
-            gr.ScaleTransform(scale, scale);
+            var p0 = Transform(new PointF(0, 0));
+            var p1 = Transform(new PointF(0, 100));
+            var p2 = Transform(new PointF(100, 0));
 
-            gr.DrawImage(bmp, 0, 0);
+
+            gr.DrawImage(bmp, new RectangleF(p0.X, p0.Y, bmp.Width * zoom, bmp.Height * zoom), new RectangleF(0, 0, bmp.Width, bmp.Height), GraphicsUnit.Pixel);
+
+            var bt = BackTransform(pos);
+            var pp = Transform(new PointF((int)bt.X, (int)bt.Y));
+            gr.DrawRectangle(Pens.Blue, pp.X, pp.Y, zoom, zoom);
+            gr.DrawLine(Pens.Red, p0, p1);
+            gr.DrawLine(Pens.Blue, p0, p2);
+            bt = GetPos();
+
+            var pickerX = (int)bt.X;
+            var pickerY = -(int)bt.Y;
+            if (pickerX < 0)
+                pickerX = 0;
+            if (pickerX > image.Width)
+                pickerX = image.Width - 1;
+            if (pickerY < 0)
+                pickerY = 0;
+            if (pickerY > image.Height)
+                pickerY = image.Height - 1;
+
+            var px = image.At<Vec3b>(pickerY, pickerX);
+            gr.FillRectangle(Brushes.White, 5, 5, 150, 150);
+            gr.DrawString($"{pickerX} {pickerY}", new Font("Arial", 10), Brushes.Blue, 10, 10);
+            gr.DrawString($"RGB: {px.Item2} {px.Item1} {px.Item0}", new Font("Arial", 10), Brushes.Blue, 10, 30);
+
+            var crop = new Mat(image, new Rect(pickerX, pickerY, 1, 1));
+            var hsv = crop.CvtColor(ColorConversionCodes.BGR2HSV);
+            var pxHsv = hsv.At<Vec3b>(0, 0);
+            gr.DrawString($"HSV: {pxHsv.Item0} {pxHsv.Item1} {pxHsv.Item2}", new Font("Arial", 10), Brushes.Blue, 10, 50);
 
             bmp.Dispose();
         }
+
+        public float sx, sy;
+        public float zoom = 1;
+
+
+        public PointF Transform(PointF p1)
+        {
+            return new PointF((p1.X + sx) * zoom, -1 * (p1.Y + sy) * zoom);
+        }
+        public PointF GetPos()
+        {
+            var pos = pictureBox1.PointToClient(Cursor.Position);
+            var posx = (pos.X / zoom - sx);
+            var posy = (-pos.Y / zoom - sy);
+
+            return new PointF(posx, posy);
+        }
+        public PointF BackTransform(PointF p1)
+        {
+            return new PointF((p1.X / zoom - sx), -(p1.Y / zoom + sy));
+        }
+
 
         Mat image;
         public void Init(string path)
         {
             //image = OpenCvSharp.Cv2.ImRead(path);
-            using (var stream = new FileStream(path, FileMode.Open)) {
-                image = Mat.FromStream(stream, ImreadModes.Unchanged);                
+            using (var stream = new FileStream(path, FileMode.Open))
+            {
+                image = Mat.FromStream(stream, ImreadModes.Unchanged);
             }
             var bmp = image.ToBitmap();
             pictureBox1.Image = bmp;
@@ -134,8 +213,17 @@ namespace BitmapPad
         bool editMode = false;
         private void toolStripButton3_Click(object sender, EventArgs e)
         {
-            editMode = true;
-            pictureBox1.Paint += PictureBox1_Paint;
+            if (editMode)
+            {
+                pictureBox1.Paint -= PictureBox1_Paint;
+                editMode = false;
+                pictureBox1.Image = image.ToBitmap();
+            }
+            else
+            {
+                editMode = true;
+                pictureBox1.Paint += PictureBox1_Paint;
+            }
         }
 
         private void toolStripButton4_Click(object sender, EventArgs e)
@@ -155,16 +243,32 @@ namespace BitmapPad
             d.AddNumericField("r2", "red max", 30);
             d.AddNumericField("g2", "green max", 255);
             d.AddNumericField("b2", "blue max", 255);
+            d.AddBoolField("hsv", "HSV");
             if (!d.ShowDialog())
                 return;
 
-            var temp = image.CvtColor(ColorConversionCodes.BGR2HSV);
+            Mat temp = null;
+            Mat res = null;
+            if (d.GetBoolField("hsv"))
+            {
+                temp = image.CvtColor(ColorConversionCodes.BGR2HSV);
+                res = temp.InRange(new Scalar(d.GetNumericField("r1"),
+             d.GetNumericField("g1"),
+             d.GetNumericField("b1")),
+             new Scalar(d.GetNumericField("r2"),
+             d.GetNumericField("g2"), d.GetNumericField("b2")));
+            }
+            else
+            {
+                temp = image.Clone();
+                res = temp.InRange(new Scalar(d.GetNumericField("b1"),
+             d.GetNumericField("g1"),
+             d.GetNumericField("r1")),
+             new Scalar(d.GetNumericField("b2"),
+             d.GetNumericField("g2"), d.GetNumericField("r2")));
+            }
 
-            var res = temp.InRange(new Scalar(d.GetNumericField("r1"),
-                d.GetNumericField("g1"),
-                d.GetNumericField("b1")),
-                new Scalar(d.GetNumericField("r2"),
-                d.GetNumericField("g2"), d.GetNumericField("b2")));
+
 
             mdi.MainForm.OpenChild(res);
         }
@@ -219,11 +323,19 @@ namespace BitmapPad
             }
         }
 
+        private void sliceToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var left = new Mat(image, new Rect(0, 0, image.Width / 2, image.Height));
+            var right = new Mat(image, new Rect(image.Width / 2, 0, image.Width / 2, image.Height));
+            mdi.MainForm.OpenChild(left);
+            mdi.MainForm.OpenChild(right);
+        }
+
         private void blurToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var d = DialogHelpers.StartDialog();
             d.AddNumericField("s", "Size", 5);
-            if (!d.ShowDialog()) 
+            if (!d.ShowDialog())
                 return;
 
             mdi.MainForm.OpenChild(image.Blur(new OpenCvSharp.Size(d.GetNumericField("s"), d.GetNumericField("s"))));
@@ -244,6 +356,29 @@ namespace BitmapPad
                 res = image.CvtColor(ColorConversionCodes.BGR2GRAY).Threshold(d.GetNumericField("min"), d.GetNumericField("max"), ThresholdTypes.Binary);
             mdi.MainForm.OpenChild(res);
 
+        }
+
+        private void connectedComponentsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //int[,] labels = null;
+            //Cv2.ConnectedComponents(image, out labels, PixelConnectivity.Connectivity8);
+            OpenCvSharp.Point[][] points = null;
+            HierarchyIndex[] hindex = null;
+            image.FindContours(out points, out hindex, RetrievalModes.Tree, ContourApproximationModes.ApproxSimple);
+            Mat ret = image.Clone();
+            ret = ret.CvtColor(ColorConversionCodes.GRAY2BGR);
+            var fr = points.OrderByDescending(z => Math.Abs(Cv2.ContourArea(z))).First();
+            List<OpenCvSharp.Point[]> points2 = new List<OpenCvSharp.Point[]>();
+            points2.Add(fr);
+            for (int i = 0; i < points2.Count; i++)
+            {
+                var mm = Cv2.Moments(points2[i]);
+                var cx = mm.M10 / mm.M00;
+                var cy = mm.M01 / mm.M00;
+                ret.DrawContours(points2.ToArray(), i, Scalar.Blue);
+                ret.DrawMarker(new OpenCvSharp.Point(cx, cy), Scalar.Red);
+            }
+            mdi.MainForm.OpenChild(ret);
         }
     }
 }

@@ -49,6 +49,9 @@
             this.toolStripDropDownButton3 = new System.Windows.Forms.ToolStripDropDownButton();
             this.blurToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.bniarizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripDropDownButton4 = new System.Windows.Forms.ToolStripDropDownButton();
+            this.connectedComponentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.sliceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
@@ -65,7 +68,7 @@
             this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pictureBox1.Location = new System.Drawing.Point(0, 27);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(800, 423);
+            this.pictureBox1.Size = new System.Drawing.Size(861, 423);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
@@ -98,10 +101,11 @@
             this.toolStripButton6,
             this.toolStripDropDownButton2,
             this.toolStripButton7,
-            this.toolStripDropDownButton3});
+            this.toolStripDropDownButton3,
+            this.toolStripDropDownButton4});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(800, 27);
+            this.toolStrip1.Size = new System.Drawing.Size(861, 27);
             this.toolStrip1.TabIndex = 1;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -234,16 +238,42 @@
             // blurToolStripMenuItem
             // 
             this.blurToolStripMenuItem.Name = "blurToolStripMenuItem";
-            this.blurToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.blurToolStripMenuItem.Size = new System.Drawing.Size(145, 26);
             this.blurToolStripMenuItem.Text = "blur";
             this.blurToolStripMenuItem.Click += new System.EventHandler(this.blurToolStripMenuItem_Click);
             // 
             // bniarizeToolStripMenuItem
             // 
             this.bniarizeToolStripMenuItem.Name = "bniarizeToolStripMenuItem";
-            this.bniarizeToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.bniarizeToolStripMenuItem.Size = new System.Drawing.Size(145, 26);
             this.bniarizeToolStripMenuItem.Text = "bniarize";
             this.bniarizeToolStripMenuItem.Click += new System.EventHandler(this.bniarizeToolStripMenuItem_Click);
+            // 
+            // toolStripDropDownButton4
+            // 
+            this.toolStripDropDownButton4.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.toolStripDropDownButton4.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.connectedComponentsToolStripMenuItem,
+            this.sliceToolStripMenuItem});
+            this.toolStripDropDownButton4.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton4.Image")));
+            this.toolStripDropDownButton4.ImageTransparentColor = System.Drawing.Color.Magenta;
+            this.toolStripDropDownButton4.Name = "toolStripDropDownButton4";
+            this.toolStripDropDownButton4.Size = new System.Drawing.Size(94, 24);
+            this.toolStripDropDownButton4.Text = "operations";
+            // 
+            // connectedComponentsToolStripMenuItem
+            // 
+            this.connectedComponentsToolStripMenuItem.Name = "connectedComponentsToolStripMenuItem";
+            this.connectedComponentsToolStripMenuItem.Size = new System.Drawing.Size(247, 26);
+            this.connectedComponentsToolStripMenuItem.Text = "connected components";
+            this.connectedComponentsToolStripMenuItem.Click += new System.EventHandler(this.connectedComponentsToolStripMenuItem_Click);
+            // 
+            // sliceToolStripMenuItem
+            // 
+            this.sliceToolStripMenuItem.Name = "sliceToolStripMenuItem";
+            this.sliceToolStripMenuItem.Size = new System.Drawing.Size(247, 26);
+            this.sliceToolStripMenuItem.Text = "slice vertical";
+            this.sliceToolStripMenuItem.Click += new System.EventHandler(this.sliceToolStripMenuItem_Click);
             // 
             // statusStrip1
             // 
@@ -252,7 +282,7 @@
             this.toolStripStatusLabel1});
             this.statusStrip1.Location = new System.Drawing.Point(0, 424);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(800, 26);
+            this.statusStrip1.Size = new System.Drawing.Size(861, 26);
             this.statusStrip1.TabIndex = 2;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -272,7 +302,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(861, 450);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.toolStrip1);
@@ -314,5 +344,8 @@
         private ToolStripDropDownButton toolStripDropDownButton3;
         private ToolStripMenuItem blurToolStripMenuItem;
         private ToolStripMenuItem bniarizeToolStripMenuItem;
+        private ToolStripDropDownButton toolStripDropDownButton4;
+        private ToolStripMenuItem connectedComponentsToolStripMenuItem;
+        private ToolStripMenuItem sliceToolStripMenuItem;
     }
 }
