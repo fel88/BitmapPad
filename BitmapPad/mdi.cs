@@ -1,4 +1,5 @@
 ﻿using OpenCvSharp;
+using OpenCvSharp.Extensions;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -34,19 +35,6 @@ namespace BitmapPad
             f.Show();
         }
 
-        private void toolStripButton1_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog ofd = new OpenFileDialog();
-            if (ofd.ShowDialog() != DialogResult.OK)
-                return;
-
-            Form1 f = new Form1();
-            f.MdiParent = this;
-            f.Init(ofd.FileName);
-            f.Show();
-
-        }
-
         private void cascadeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             LayoutMdi(MdiLayout.Cascade);
@@ -67,6 +55,27 @@ namespace BitmapPad
         {
             LayoutMdi(MdiLayout.ArrangeIcons);
 
+        }
+
+        private void fileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+            if (ofd.ShowDialog() != DialogResult.OK)
+                return;
+
+            Form1 f = new Form1();
+            f.MdiParent = this;
+            f.Init(ofd.FileName);
+            f.Show();
+        }
+
+        private void clipboardToolStripMenuItem_Click(object sender, EventArgs e)
+        {            
+            Form1 f = new Form1();
+            f.MdiParent = this;
+            var bmp = ((Bitmap)Clipboard.GetImage()).ToMat();
+            f.Init(bmp);
+            f.Show();
         }
     }
 }

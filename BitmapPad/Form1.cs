@@ -149,16 +149,7 @@ namespace BitmapPad
 
 
         Mat image;
-        public void Init(string path)
-        {
-            //image = OpenCvSharp.Cv2.ImRead(path);
-            using (var stream = new FileStream(path, FileMode.Open))
-            {
-                image = Mat.FromStream(stream, ImreadModes.Unchanged);
-            }
-            var bmp = image.ToBitmap();
-            pictureBox1.Image = bmp;
-        }
+       
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
             if (pictureBox1.SizeMode == PictureBoxSizeMode.Zoom)
@@ -175,12 +166,24 @@ namespace BitmapPad
             mdi.MainForm.OpenChild(dest);
 
         }
+        public void Init(string path)
+        {
+            Text = path;
+            //image = OpenCvSharp.Cv2.ImRead(path);
+            using (var stream = new FileStream(path, FileMode.Open))
+            {
+                image = Mat.FromStream(stream, ImreadModes.Unchanged);
+            }
+            Init(image);            
+        }
 
         internal void Init(Mat mat)
-        {
+        {            
             image = mat;
             var bmp = image.ToBitmap();
             pictureBox1.Image = bmp;
+
+            toolStripStatusLabel1.Text = $"{bmp.Width}x{bmp.Height}";
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -342,6 +345,17 @@ namespace BitmapPad
         private void toClipboardToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Clipboard.SetImage(pictureBox1.Image);
+        }
+
+        private void resizeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var d = DialogHelpers.StartDialog();
+            d.AddNumericField("w", "Width", image.Width);
+            d.AddNumericField("h", "Height", image.Height);
+            if (!d.ShowDialog())
+                return;
+
+            mdi.MainForm.OpenChild(image.Resize(new OpenCvSharp.Size(d.GetNumericField("w"), d.GetNumericField("h"))));
         }
 
         private void blurToolStripMenuItem_Click(object sender, EventArgs e)
