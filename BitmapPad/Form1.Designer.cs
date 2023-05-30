@@ -52,9 +52,11 @@
             this.toolStripDropDownButton4 = new System.Windows.Forms.ToolStripDropDownButton();
             this.connectedComponentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sliceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.sliceHorizontalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
+            this.toClipboardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -77,14 +79,15 @@
             // 
             this.contextMenuStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.openToolStripMenuItem});
+            this.openToolStripMenuItem,
+            this.toClipboardToolStripMenuItem});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(113, 28);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(211, 80);
             // 
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(112, 24);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(210, 24);
             this.openToolStripMenuItem.Text = "open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
@@ -254,7 +257,8 @@
             this.toolStripDropDownButton4.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.toolStripDropDownButton4.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.connectedComponentsToolStripMenuItem,
-            this.sliceToolStripMenuItem});
+            this.sliceToolStripMenuItem,
+            this.sliceHorizontalToolStripMenuItem});
             this.toolStripDropDownButton4.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton4.Image")));
             this.toolStripDropDownButton4.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripDropDownButton4.Name = "toolStripDropDownButton4";
@@ -274,6 +278,13 @@
             this.sliceToolStripMenuItem.Size = new System.Drawing.Size(247, 26);
             this.sliceToolStripMenuItem.Text = "slice vertical";
             this.sliceToolStripMenuItem.Click += new System.EventHandler(this.sliceToolStripMenuItem_Click);
+            // 
+            // sliceHorizontalToolStripMenuItem
+            // 
+            this.sliceHorizontalToolStripMenuItem.Name = "sliceHorizontalToolStripMenuItem";
+            this.sliceHorizontalToolStripMenuItem.Size = new System.Drawing.Size(247, 26);
+            this.sliceHorizontalToolStripMenuItem.Text = "slice horizontal";
+            this.sliceHorizontalToolStripMenuItem.Click += new System.EventHandler(this.sliceHorizontalToolStripMenuItem_Click);
             // 
             // statusStrip1
             // 
@@ -297,6 +308,13 @@
             this.timer1.Enabled = true;
             this.timer1.Interval = 25;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
+            // toClipboardToolStripMenuItem
+            // 
+            this.toClipboardToolStripMenuItem.Name = "toClipboardToolStripMenuItem";
+            this.toClipboardToolStripMenuItem.Size = new System.Drawing.Size(210, 24);
+            this.toClipboardToolStripMenuItem.Text = "to clipboard";
+            this.toClipboardToolStripMenuItem.Click += new System.EventHandler(this.toClipboardToolStripMenuItem_Click);
             // 
             // Form1
             // 
@@ -347,5 +365,7 @@
         private ToolStripDropDownButton toolStripDropDownButton4;
         private ToolStripMenuItem connectedComponentsToolStripMenuItem;
         private ToolStripMenuItem sliceToolStripMenuItem;
+        private ToolStripMenuItem sliceHorizontalToolStripMenuItem;
+        private ToolStripMenuItem toClipboardToolStripMenuItem;
     }
 }

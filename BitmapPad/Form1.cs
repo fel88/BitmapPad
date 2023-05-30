@@ -331,6 +331,19 @@ namespace BitmapPad
             mdi.MainForm.OpenChild(right);
         }
 
+        private void sliceHorizontalToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var top = new Mat(image, new Rect(0, 0, image.Width, image.Height / 2));
+            var bottom = new Mat(image, new Rect(0, image.Height / 2, image.Width, image.Height / 2));
+            mdi.MainForm.OpenChild(top);
+            mdi.MainForm.OpenChild(bottom);
+        }
+
+        private void toClipboardToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Clipboard.SetImage(pictureBox1.Image);
+        }
+
         private void blurToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var d = DialogHelpers.StartDialog();
