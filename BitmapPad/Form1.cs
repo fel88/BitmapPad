@@ -373,14 +373,21 @@ namespace BitmapPad
             var d = DialogHelpers.StartDialog();
             d.AddNumericField("min", "Minimum", 128);
             d.AddNumericField("max", "Maximum", 255);
+            d.AddBoolField("otsu", "Otsu");
+
             if (!d.ShowDialog())
                 return;
 
             Mat res = null;
+            var method = ThresholdTypes.Binary;
+            if (d.GetBoolField("otsu"))
+            {
+                method = ThresholdTypes.Otsu;
+            }
             if (image.Channels() == 1)
-                res = image.Threshold(d.GetNumericField("min"), d.GetNumericField("max"), ThresholdTypes.Binary);
+                res = image.Threshold(d.GetNumericField("min"), d.GetNumericField("max"), method);
             else
-                res = image.CvtColor(ColorConversionCodes.BGR2GRAY).Threshold(d.GetNumericField("min"), d.GetNumericField("max"), ThresholdTypes.Binary);
+                res = image.CvtColor(ColorConversionCodes.BGR2GRAY).Threshold(d.GetNumericField("min"), d.GetNumericField("max"), method);
             mdi.MainForm.OpenChild(res);
 
         }
