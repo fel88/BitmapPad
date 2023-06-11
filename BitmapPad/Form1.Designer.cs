@@ -54,10 +54,13 @@
             this.connectedComponentsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sliceToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sliceHorizontalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.resizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.cropWhiteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.resizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.asMonochrome1BitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.contextMenuStrip1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -71,7 +74,7 @@
             this.pictureBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.pictureBox1.Location = new System.Drawing.Point(0, 27);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(861, 423);
+            this.pictureBox1.Size = new System.Drawing.Size(887, 397);
             this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
@@ -116,7 +119,7 @@
             this.toolStripDropDownButton4});
             this.toolStrip1.Location = new System.Drawing.Point(0, 0);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(861, 27);
+            this.toolStrip1.Size = new System.Drawing.Size(887, 27);
             this.toolStrip1.TabIndex = 1;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -124,7 +127,8 @@
             // 
             this.toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.saveToolStripMenuItem});
+            this.saveToolStripMenuItem,
+            this.exportToolStripMenuItem});
             this.toolStripDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton1.Image")));
             this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
@@ -134,7 +138,7 @@
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(123, 26);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
             this.saveToolStripMenuItem.Text = "Save";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
@@ -267,7 +271,8 @@
             this.connectedComponentsToolStripMenuItem,
             this.sliceToolStripMenuItem,
             this.sliceHorizontalToolStripMenuItem,
-            this.resizeToolStripMenuItem});
+            this.resizeToolStripMenuItem,
+            this.cropWhiteToolStripMenuItem});
             this.toolStripDropDownButton4.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton4.Image")));
             this.toolStripDropDownButton4.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.toolStripDropDownButton4.Name = "toolStripDropDownButton4";
@@ -295,6 +300,20 @@
             this.sliceHorizontalToolStripMenuItem.Text = "slice horizontal";
             this.sliceHorizontalToolStripMenuItem.Click += new System.EventHandler(this.sliceHorizontalToolStripMenuItem_Click);
             // 
+            // resizeToolStripMenuItem
+            // 
+            this.resizeToolStripMenuItem.Name = "resizeToolStripMenuItem";
+            this.resizeToolStripMenuItem.Size = new System.Drawing.Size(247, 26);
+            this.resizeToolStripMenuItem.Text = "resize";
+            this.resizeToolStripMenuItem.Click += new System.EventHandler(this.resizeToolStripMenuItem_Click);
+            // 
+            // cropWhiteToolStripMenuItem
+            // 
+            this.cropWhiteToolStripMenuItem.Name = "cropWhiteToolStripMenuItem";
+            this.cropWhiteToolStripMenuItem.Size = new System.Drawing.Size(247, 26);
+            this.cropWhiteToolStripMenuItem.Text = "crop white";
+            this.cropWhiteToolStripMenuItem.Click += new System.EventHandler(this.cropWhiteToolStripMenuItem_Click);
+            // 
             // statusStrip1
             // 
             this.statusStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
@@ -302,7 +321,7 @@
             this.toolStripStatusLabel1});
             this.statusStrip1.Location = new System.Drawing.Point(0, 424);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(861, 26);
+            this.statusStrip1.Size = new System.Drawing.Size(887, 26);
             this.statusStrip1.TabIndex = 2;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -318,21 +337,29 @@
             this.timer1.Interval = 25;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
-            // resizeToolStripMenuItem
+            // exportToolStripMenuItem
             // 
-            this.resizeToolStripMenuItem.Name = "resizeToolStripMenuItem";
-            this.resizeToolStripMenuItem.Size = new System.Drawing.Size(247, 26);
-            this.resizeToolStripMenuItem.Text = "resize";
-            this.resizeToolStripMenuItem.Click += new System.EventHandler(this.resizeToolStripMenuItem_Click);
+            this.exportToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.asMonochrome1BitToolStripMenuItem});
+            this.exportToolStripMenuItem.Name = "exportToolStripMenuItem";
+            this.exportToolStripMenuItem.Size = new System.Drawing.Size(224, 26);
+            this.exportToolStripMenuItem.Text = "Export";
+            // 
+            // asMonochrome1BitToolStripMenuItem
+            // 
+            this.asMonochrome1BitToolStripMenuItem.Name = "asMonochrome1BitToolStripMenuItem";
+            this.asMonochrome1BitToolStripMenuItem.Size = new System.Drawing.Size(243, 26);
+            this.asMonochrome1BitToolStripMenuItem.Text = "as monochrome (1 bit)";
+            this.asMonochrome1BitToolStripMenuItem.Click += new System.EventHandler(this.asMonochrome1BitToolStripMenuItem_Click);
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(861, 450);
-            this.Controls.Add(this.statusStrip1);
+            this.ClientSize = new System.Drawing.Size(887, 450);
             this.Controls.Add(this.pictureBox1);
             this.Controls.Add(this.toolStrip1);
+            this.Controls.Add(this.statusStrip1);
             this.Name = "Form1";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Image";
@@ -377,5 +404,8 @@
         private ToolStripMenuItem sliceHorizontalToolStripMenuItem;
         private ToolStripMenuItem toClipboardToolStripMenuItem;
         private ToolStripMenuItem resizeToolStripMenuItem;
+        private ToolStripMenuItem cropWhiteToolStripMenuItem;
+        private ToolStripMenuItem exportToolStripMenuItem;
+        private ToolStripMenuItem asMonochrome1BitToolStripMenuItem;
     }
 }

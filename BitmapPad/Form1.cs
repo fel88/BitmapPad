@@ -3,6 +3,7 @@ using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using OpenCvSharp.XPhoto;
 using System.Diagnostics;
+using System.Drawing.Imaging;
 using System.IO.Packaging;
 using static System.Windows.Forms.AxHost;
 
@@ -356,6 +357,32 @@ namespace BitmapPad
                 return;
 
             mdi.MainForm.OpenChild(image.Resize(new OpenCvSharp.Size(d.GetNumericField("w"), d.GetNumericField("h"))));
+        }
+
+        private void cropWhiteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Mat inv = new Mat();
+            Cv2.BitwiseNot(image, inv);
+            var coords = inv.FindNonZero();
+            var rect = Cv2.BoundingRect(coords);
+            var cropped = image.Clone(rect);
+
+            mdi.MainForm.OpenChild(cropped);
+        }               
+
+        private void asMonochrome1BitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            if (sfd.ShowDialog() != DialogResult.OK)
+                return;
+
+            using (var bmp = image.ToBitmap())
+            {
+                using (var clone = bmp.Clone(new Rectangle(0, 0, bmp.Width, bmp.Height), PixelFormat.Format1bppIndexed))
+                {
+                    clone.Save(sfd.FileName);
+                }
+            }
         }
 
         private void blurToolStripMenuItem_Click(object sender, EventArgs e)
