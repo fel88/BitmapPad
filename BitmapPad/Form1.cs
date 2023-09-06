@@ -5,6 +5,7 @@ using OpenCvSharp.XPhoto;
 using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.IO.Packaging;
+using System.Text;
 using static System.Windows.Forms.AxHost;
 
 namespace BitmapPad
@@ -93,18 +94,27 @@ namespace BitmapPad
             var p1 = Transform(new PointF(0, 100));
             var p2 = Transform(new PointF(100, 0));
 
-
-            gr.DrawImage(bmp, new RectangleF(p0.X, p0.Y, bmp.Width * zoom, bmp.Height * zoom), new RectangleF(0, 0, bmp.Width, bmp.Height), GraphicsUnit.Pixel);
+            var temp1 = gr.PixelOffsetMode;
+            gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
+            gr.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+            gr.DrawImage(bmp, new RectangleF(p0.X, p0.Y, bmp.Width * zoom, bmp.Height * zoom), new Rectangle(0, 0, bmp.Width, bmp.Height), GraphicsUnit.Pixel);
+            
+            gr.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Bicubic;
+            gr.PixelOffsetMode = temp1;
 
             var bt = BackTransform(pos);
             var pp = Transform(new PointF((int)bt.X, (int)bt.Y));
             gr.DrawRectangle(Pens.Blue, pp.X, pp.Y, zoom, zoom);
+
             gr.DrawLine(Pens.Red, p0, p1);
             gr.DrawLine(Pens.Blue, p0, p2);
             bt = GetPos();
 
             var pickerX = (int)bt.X;
             var pickerY = -(int)bt.Y;
+
+
+
             if (pickerX < 0)
                 pickerX = 0;
             if (pickerX > image.Width)
@@ -119,11 +129,13 @@ namespace BitmapPad
             gr.DrawString($"{pickerX} {pickerY}", new Font("Arial", 10), Brushes.Blue, 10, 10);
             gr.DrawString($"RGB: {px.Item2} {px.Item1} {px.Item0}", new Font("Arial", 10), Brushes.Blue, 10, 30);
 
-            var crop = new Mat(image, new Rect(pickerX, pickerY, 1, 1));
-            var hsv = crop.CvtColor(ColorConversionCodes.BGR2HSV);
-            var pxHsv = hsv.At<Vec3b>(0, 0);
-            gr.DrawString($"HSV: {pxHsv.Item0} {pxHsv.Item1} {pxHsv.Item2}", new Font("Arial", 10), Brushes.Blue, 10, 50);
-
+            if (pickerX >= 0 && pickerY >= 0 && pickerX < image.Width && pickerY < image.Height)
+            {
+                var crop = new Mat(image, new Rect(pickerX, pickerY, 1, 1));
+                var hsv = crop.CvtColor(ColorConversionCodes.BGR2HSV);
+                var pxHsv = hsv.At<Vec3b>(0, 0);
+                gr.DrawString($"HSV: {pxHsv.Item0} {pxHsv.Item1} {pxHsv.Item2}", new Font("Arial", 10), Brushes.Blue, 10, 50);
+            }
             bmp.Dispose();
         }
 
@@ -150,7 +162,7 @@ namespace BitmapPad
 
 
         Mat image;
-       
+
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
             if (pictureBox1.SizeMode == PictureBoxSizeMode.Zoom)
@@ -175,11 +187,11 @@ namespace BitmapPad
             {
                 image = Mat.FromStream(stream, ImreadModes.Unchanged);
             }
-            Init(image);            
+            Init(image);
         }
 
         internal void Init(Mat mat)
-        {            
+        {
             image = mat;
             var bmp = image.ToBitmap();
             pictureBox1.Image = bmp;
@@ -368,7 +380,7 @@ namespace BitmapPad
             var cropped = image.Clone(rect);
 
             mdi.MainForm.OpenChild(cropped);
-        }               
+        }
 
         private void asMonochrome1BitToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -383,6 +395,52 @@ namespace BitmapPad
                     clone.Save(sfd.FileName);
                 }
             }
+        }
+
+        private void toolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStripMenuItem2_Click(object sender, EventArgs e)
+        {
+            SaveFileDialog sfd = new SaveFileDialog();
+            if (sfd.ShowDialog() != DialogResult.OK)
+                return;
+
+            using (var bmp = image.ToBitmap())
+            {
+                StringBuilder sb = new StringBuilder();
+                sb.AppendLine("P3");
+                sb.AppendLine($"{bmp.Width} {bmp.Height}");
+                sb.AppendLine("255");
+                for (int j = 0; j < bmp.Height; j++)
+                {
+                    for (int i = 0; i < bmp.Width; i++)
+                    {
+                        var px = bmp.GetPixel(i, j);
+                        sb.AppendLine($"{px.R} {px.G} {px.B}");
+                    }
+                }
+
+                File.WriteAllText(sfd.FileName, sb.ToString());
+            }
+        }
+
+        private void nearestToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            pictureBox1.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
+            nearestToolStripMenuItem.Checked = true;
+            cubicToolStripMenuItem.Checked = false;
+            pictureBox1.Invalidate();
+        }
+
+        private void cubicToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            pictureBox1.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Bicubic;
+            nearestToolStripMenuItem.Checked = false;
+            cubicToolStripMenuItem.Checked = true;
+            pictureBox1.Invalidate();
         }
 
         private void blurToolStripMenuItem_Click(object sender, EventArgs e)
