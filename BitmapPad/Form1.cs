@@ -125,7 +125,7 @@ namespace BitmapPad
                 pickerY = image.Height - 1;
 
             var px = image.At<Vec3b>(pickerY, pickerX);
-            gr.FillRectangle(Brushes.White, 5, 5, 150, 150);
+            gr.FillRectangle(new SolidBrush(Color.FromArgb(128,Color.White)), 5, 5, 150, 150);
             gr.DrawString($"{pickerX} {pickerY}", new Font("Arial", 10), Brushes.Blue, 10, 10);
             gr.DrawString($"RGB: {px.Item2} {px.Item1} {px.Item0}", new Font("Arial", 10), Brushes.Blue, 10, 30);
 
