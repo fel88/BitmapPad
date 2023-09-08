@@ -2,6 +2,7 @@ using AutoDialog;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using OpenCvSharp.XPhoto;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing.Imaging;
 using System.IO.Packaging;
@@ -98,7 +99,7 @@ namespace BitmapPad
             gr.PixelOffsetMode = System.Drawing.Drawing2D.PixelOffsetMode.Half;
             gr.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.NearestNeighbor;
             gr.DrawImage(bmp, new RectangleF(p0.X, p0.Y, bmp.Width * zoom, bmp.Height * zoom), new Rectangle(0, 0, bmp.Width, bmp.Height), GraphicsUnit.Pixel);
-            
+
             gr.InterpolationMode = System.Drawing.Drawing2D.InterpolationMode.Bicubic;
             gr.PixelOffsetMode = temp1;
 
@@ -125,16 +126,19 @@ namespace BitmapPad
                 pickerY = image.Height - 1;
 
             var px = image.At<Vec3b>(pickerY, pickerX);
-            gr.FillRectangle(new SolidBrush(Color.FromArgb(128,Color.White)), 5, 5, 150, 150);
+            gr.FillRectangle(new SolidBrush(Color.FromArgb(128, Color.White)), 5, 5, 150, 150);
             gr.DrawString($"{pickerX} {pickerY}", new Font("Arial", 10), Brushes.Blue, 10, 10);
             gr.DrawString($"RGB: {px.Item2} {px.Item1} {px.Item0}", new Font("Arial", 10), Brushes.Blue, 10, 30);
 
             if (pickerX >= 0 && pickerY >= 0 && pickerX < image.Width && pickerY < image.Height)
             {
                 var crop = new Mat(image, new Rect(pickerX, pickerY, 1, 1));
-                var hsv = crop.CvtColor(ColorConversionCodes.BGR2HSV);
-                var pxHsv = hsv.At<Vec3b>(0, 0);
-                gr.DrawString($"HSV: {pxHsv.Item0} {pxHsv.Item1} {pxHsv.Item2}", new Font("Arial", 10), Brushes.Blue, 10, 50);
+                if (crop.Channels() == 3)
+                {
+                    var hsv = crop.CvtColor(ColorConversionCodes.BGR2HSV);
+                    var pxHsv = hsv.At<Vec3b>(0, 0);
+                    gr.DrawString($"HSV: {pxHsv.Item0} {pxHsv.Item1} {pxHsv.Item2}", new Font("Arial", 10), Brushes.Blue, 10, 50);
+                }
             }
             bmp.Dispose();
         }
@@ -341,18 +345,12 @@ namespace BitmapPad
 
         private void sliceToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var left = new Mat(image, new Rect(0, 0, image.Width / 2, image.Height));
-            var right = new Mat(image, new Rect(image.Width / 2, 0, image.Width / 2, image.Height));
-            mdi.MainForm.OpenChild(left);
-            mdi.MainForm.OpenChild(right);
+
         }
 
         private void sliceHorizontalToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            var top = new Mat(image, new Rect(0, 0, image.Width, image.Height / 2));
-            var bottom = new Mat(image, new Rect(0, image.Height / 2, image.Width, image.Height / 2));
-            mdi.MainForm.OpenChild(top);
-            mdi.MainForm.OpenChild(bottom);
+
         }
 
         private void toClipboardToolStripMenuItem_Click(object sender, EventArgs e)
@@ -373,13 +371,7 @@ namespace BitmapPad
 
         private void cropWhiteToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Mat inv = new Mat();
-            Cv2.BitwiseNot(image, inv);
-            var coords = inv.FindNonZero();
-            var rect = Cv2.BoundingRect(coords);
-            var cropped = image.Clone(rect);
 
-            mdi.MainForm.OpenChild(cropped);
         }
 
         private void asMonochrome1BitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -441,6 +433,110 @@ namespace BitmapPad
             nearestToolStripMenuItem.Checked = false;
             cubicToolStripMenuItem.Checked = true;
             pictureBox1.Invalidate();
+        }
+
+        private void minimalRectToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Mat inv = new Mat();
+            var bmp = image.ToBitmap();
+            List<Point2f> pp = new List<Point2f>();
+            for (int i = 0; i < bmp.Width; i++)
+            {
+                for (int j = 0; j < bmp.Height; j++)
+                {
+                    if (bmp.GetPixel(i, j).R > 128)
+                    {
+                        pp.Add(new Point2f(i, j));
+                    }
+                }
+            }
+            bmp.Dispose();
+            Cv2.BitwiseNot(image, inv);
+
+            var rect = Cv2.MinAreaRect(pp.ToArray());
+
+            var mtr = Cv2.GetRotationMatrix2D(rect.Center, rect.Angle, 1);
+            //var pp1 = rect.Points().OrderBy(z=>z.X).ThenBy(z=>z.Y).ToArray();
+            var ptr = Cv2.GetPerspectiveTransform(rect.Points(), new Point2f[] { new Point2f (0,rect.Size.Height),new Point2f (0,0),
++            new Point2f (rect.Size.Width,0),new Point2f (rect.Size.Width,rect.Size.Height)});
+            var cropped = image.WarpPerspective(ptr, new OpenCvSharp.Size(rect.Size.Width, rect.Size.Height));
+            //var cropped = image.WarpAffine(mtr, new OpenCvSharp.Size(rect.Size.Width, rect.Size.Height));            
+
+            mdi.MainForm.OpenChild(cropped);
+        }
+
+        private void inverseToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Mat inversed = new Mat();
+            Cv2.BitwiseNot(image, inversed);
+            mdi.MainForm.OpenChild(inversed);
+        }
+
+        private void horizontalToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //todo make dialog to select N parts
+            var top = new Mat(image, new Rect(0, 0, image.Width, image.Height / 2));
+            var bottom = new Mat(image, new Rect(0, image.Height / 2, image.Width, image.Height / 2));
+            mdi.MainForm.OpenChild(top);
+            mdi.MainForm.OpenChild(bottom);
+        }
+
+        private void verticalToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var left = new Mat(image, new Rect(0, 0, image.Width / 2, image.Height));
+            var right = new Mat(image, new Rect(image.Width / 2, 0, image.Width / 2, image.Height));
+            mdi.MainForm.OpenChild(left);
+            mdi.MainForm.OpenChild(right);
+        }
+
+        private void whiteToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //make dialog to select color black/white
+            Mat inv = new Mat();
+            Cv2.BitwiseNot(image, inv);
+            var coords = inv.FindNonZero();
+            var rect = Cv2.BoundingRect(coords);
+            var cropped = image.Clone(rect);
+
+            mdi.MainForm.OpenChild(cropped);
+        }
+
+        private void toolStripMenuItem3_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStripMenuItem4_Click(object sender, EventArgs e)
+        {
+            Mat dst = new Mat();
+            Cv2.Rotate(image, dst, RotateFlags.Rotate90Counterclockwise);
+            mdi.MainForm.OpenChild(dst);
+        }
+
+        private void toolStripMenuItem5_Click(object sender, EventArgs e)
+        {
+            Mat dst = new Mat();
+            Cv2.Rotate(image, dst, RotateFlags.Rotate90Clockwise);
+            mdi.MainForm.OpenChild(dst);
+        }
+
+        private void toolStripMenuItem6_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStripMenuItem7_Click(object sender, EventArgs e)
+        {
+            Mat dst = new Mat();
+            Cv2.Flip(image, dst, FlipMode.Y);
+            mdi.MainForm.OpenChild(dst);
+        }
+
+        private void toolStripMenuItem8_Click(object sender, EventArgs e)
+        {
+            Mat dst = new Mat();
+            Cv2.Flip(image, dst, FlipMode.X);
+            mdi.MainForm.OpenChild(dst);
         }
 
         private void blurToolStripMenuItem_Click(object sender, EventArgs e)

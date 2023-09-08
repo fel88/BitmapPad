@@ -1,0 +1,7 @@
+1. dithering
+2. webp support
+3. graph pipeline editor
+4. ribbon panel
+5. rotate image
+6. warp perspective
+7. manual crop
