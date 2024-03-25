@@ -1,7 +1,9 @@
 using AutoDialog;
+using DitheringLib;
 using OpenCvSharp;
 using OpenCvSharp.Extensions;
 using OpenCvSharp.XPhoto;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing.Imaging;
@@ -200,7 +202,7 @@ namespace BitmapPad
             var bmp = image.ToBitmap();
             pictureBox1.Image = bmp;
 
-            toolStripStatusLabel1.Text = $"{bmp.Width}x{bmp.Height}";
+            toolStripStatusLabel1.Text = $"{bmp.Width}x{bmp.Height} ({bmp.PixelFormat})";
         }
 
         private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -295,7 +297,8 @@ namespace BitmapPad
 
         private void toolStripButton6_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Resolution: " + image.Size() + Environment.NewLine + "Channels: " + image.Channels());
+            MessageBox.Show("Resolution: " + image.Size() + Environment.NewLine + "Channels: " + image.Channels() +
+                $"{Environment.NewLine}Aspect: {Math.Round((double)image.Width / image.Height, 4)}");
         }
 
         private void toolStripButton7_Click(object sender, EventArgs e)
@@ -361,8 +364,8 @@ namespace BitmapPad
         private void resizeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var d = DialogHelpers.StartDialog();
-            d.AddNumericField("w", "Width", image.Width);
-            d.AddNumericField("h", "Height", image.Height);
+            d.AddNumericField("w", "Width", image.Width, 10000, 1, 0);
+            d.AddNumericField("h", "Height", image.Height, 10000, 1, 0);
             if (!d.ShowDialog())
                 return;
 
@@ -374,6 +377,7 @@ namespace BitmapPad
 
         }
 
+
         private void asMonochrome1BitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             SaveFileDialog sfd = new SaveFileDialog();
@@ -384,7 +388,7 @@ namespace BitmapPad
             {
                 using (var clone = bmp.Clone(new Rectangle(0, 0, bmp.Width, bmp.Height), PixelFormat.Format1bppIndexed))
                 {
-                    clone.Save(sfd.FileName);
+                    clone.Save(sfd.FileName, ImageFormat.Bmp);
                 }
             }
         }
@@ -539,6 +543,34 @@ namespace BitmapPad
             mdi.MainForm.OpenChild(dst);
         }
 
+        private void ditheringToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+            Dithering d = new Dithering();
+            using var tt = image.ToBitmap();
+            using var res = d.Process(tt);
+
+            mdi.MainForm.OpenChild(res.ToMat());
+        }
+
+        private void customToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var d = DialogHelpers.StartDialog();
+            d.AddNumericField("top", "Top", 0, image.Height - 1, 0, 0);
+            d.AddNumericField("bottom", "Bottom", 0, image.Height - 1, 0, 0);
+            d.AddNumericField("left", "Left", 0, image.Width - 1, 0, 0);
+            d.AddNumericField("right", "Right", 0, image.Width - 1, 0, 0);
+            if (!d.ShowDialog())
+                return;
+
+            var xx = d.GetIntegerNumericField("left");
+            var yy = d.GetIntegerNumericField("top");
+            var ww = image.Width - d.GetIntegerNumericField("right") - xx;
+            var hh = image.Height - d.GetIntegerNumericField("bottom") - yy;
+            var crop = new Mat(image, new Rect(xx, yy, ww, hh));
+            mdi.MainForm.OpenChild(crop);
+        }
+
         private void blurToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var d = DialogHelpers.StartDialog();
@@ -596,4 +628,5 @@ namespace BitmapPad
             mdi.MainForm.OpenChild(ret);
         }
     }
+
 }

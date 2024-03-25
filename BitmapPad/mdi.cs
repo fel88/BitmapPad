@@ -18,7 +18,9 @@ namespace BitmapPad
         public mdi()
         {
             InitializeComponent();
-            MainForm = this;
+            MainForm = this; 
+            DragEnter += Form1_DragEnter;
+            DragDrop += Form1_DragDrop;
         }
 
         public static mdi MainForm;
@@ -40,6 +42,21 @@ namespace BitmapPad
             LayoutMdi(MdiLayout.Cascade);
         }
 
+        void Form1_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+                e.Effect = DragDropEffects.Copy;
+        }
+
+        void Form1_DragDrop(object sender, DragEventArgs e)
+        {
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+            foreach (string file in files)
+            {
+                Open(file);
+            }
+        }
+
         private void tileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             LayoutMdi(MdiLayout.TileVertical);
@@ -57,16 +74,21 @@ namespace BitmapPad
 
         }
 
+        private void Open(string path)
+        {           
+            Form1 f = new Form1();
+            f.MdiParent = this;
+            f.Init(path);
+            f.Show();
+        }
+
         private void fileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
             if (ofd.ShowDialog() != DialogResult.OK)
                 return;
 
-            Form1 f = new Form1();
-            f.MdiParent = this;
-            f.Init(ofd.FileName);
-            f.Show();
+            Open(ofd.FileName);            
         }
 
         private void clipboardToolStripMenuItem_Click(object sender, EventArgs e)
