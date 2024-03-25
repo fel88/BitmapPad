@@ -366,10 +366,13 @@ namespace BitmapPad
             var d = DialogHelpers.StartDialog();
             d.AddNumericField("w", "Width", image.Width, 10000, 1, 0);
             d.AddNumericField("h", "Height", image.Height, 10000, 1, 0);
+            d.AddOptionsField("mode", "Interpolation", Enum.GetNames(typeof(InterpolationFlags)), Enum.GetName(typeof(InterpolationFlags), InterpolationFlags.Linear));
             if (!d.ShowDialog())
                 return;
 
-            mdi.MainForm.OpenChild(image.Resize(new OpenCvSharp.Size(d.GetNumericField("w"), d.GetNumericField("h"))));
+            var mode = d.GetOptionsField("mode");
+            var ff = (InterpolationFlags)Enum.Parse(typeof(InterpolationFlags), mode);
+            mdi.MainForm.OpenChild(image.Resize(new OpenCvSharp.Size(d.GetNumericField("w"), d.GetNumericField("h")), interpolation: ff));
         }
 
         private void cropWhiteToolStripMenuItem_Click(object sender, EventArgs e)
