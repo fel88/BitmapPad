@@ -656,8 +656,7 @@ namespace BitmapPad
                 return;
 
             var ca = cropEditor.CropArea;
-            var crop = new Mat(image, new Rect((int)ca.X, (int)ca.Y, (int)ca.Width, (int)ca.Height));
-            SpawnChild(crop);
+            SpawnChild(image.Clone(new Rect((int)ca.X, (int)ca.Y, (int)ca.Width, (int)ca.Height)));
         }
 
 
@@ -690,10 +689,165 @@ namespace BitmapPad
         {
             pictureBox1.BackColor = BackColor = Color.Black;
         }
+        public static Scalar[] FindDominantColors(Mat image, int k)
+        {
+            // 1. Convert to a suitable color space (e.g., HSV)
+            Mat hsvImage = new Mat();
+            Cv2.CvtColor(image, hsvImage, ColorConversionCodes.BGR2HSV);
 
+            // 2. Reshape the image data for K-Means
+            Mat samples = new Mat(hsvImage.Rows * hsvImage.Cols, 3, MatType.CV_32F);
+            for (int y = 0; y < hsvImage.Rows; y++)
+            {
+                for (int x = 0; x < hsvImage.Cols; x++)
+                {
+                    Vec3b pixel = hsvImage.Get<Vec3b>(y, x);
+                    samples.Set(y * hsvImage.Cols + x, 0, (float)pixel.Item0); // H
+                    samples.Set(y * hsvImage.Cols + x, 1, (float)pixel.Item1); // S
+                    samples.Set(y * hsvImage.Cols + x, 2, (float)pixel.Item2); // V
+                }
+            }
+
+            // 3. Apply K-Means clustering
+            Mat labels = new Mat();
+            Mat centers = new Mat();
+            Cv2.Kmeans(samples, k, labels, new TermCriteria(CriteriaTypes.Eps | CriteriaTypes.MaxIter, 10, 1.0), 3, KMeansFlags.PpCenters, centers);
+
+            // 4. Extract dominant colors (cluster centroids)
+            Scalar[] dominantColors = new Scalar[k];
+            for (int i = 0; i < k; i++)
+            {
+                // Convert back to BGR if needed for visualization
+                Mat colorMat = new Mat(1, 1, MatType.CV_8UC3);
+                colorMat.Set(0, 0, new Vec3b((byte)centers.Get<float>(i, 0), (byte)centers.Get<float>(i, 1), (byte)centers.Get<float>(i, 2)));
+                Mat bgrColor = new Mat();
+                Cv2.CvtColor(colorMat, bgrColor, ColorConversionCodes.HSV2BGR);
+                dominantColors[i] = new Scalar(bgrColor.Get<Vec3b>(0, 0).Item0, bgrColor.Get<Vec3b>(0, 0).Item1, bgrColor.Get<Vec3b>(0, 0).Item2);
+            }
+            return dominantColors;
+        }
         private void whiteToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             pictureBox1.BackColor = BackColor = Color.White;
+        }
+        // You can also define a custom palette directly
+        public static Mat QuantizeToCustomPalette(Mat src, List<Vec3b> customPalette)
+        {
+            Mat dst = new Mat(src.Size(), src.Type());
+            for (int r = 0; r < src.Rows; r++)
+            {
+                for (int c = 0; c < src.Cols; c++)
+                {
+                    Vec3b originalColor = src.At<Vec3b>(r, c);
+                    Vec3b closestColor = FindClosestColor(originalColor, customPalette);
+                    dst.Set(r, c, closestColor);
+                }
+            }
+            return dst;
+        }
+
+        // Helper function to find the closest color in a palette
+        private static Vec3b FindClosestColor(Vec3b targetColor, List<Vec3b> palette)
+        {
+            double minDistance = double.MaxValue;
+            Vec3b closestColor = palette[0];
+
+            foreach (var paletteColor in palette)
+            {
+                // Calculate Euclidean distance (or other color distance metric)
+                double distance = System.Math.Pow(targetColor.Item0 - paletteColor.Item0, 2) +
+                                  System.Math.Pow(targetColor.Item1 - paletteColor.Item1, 2) +
+                                  System.Math.Pow(targetColor.Item2 - paletteColor.Item2, 2);
+
+                if (distance < minDistance)
+                {
+                    minDistance = distance;
+                    closestColor = paletteColor;
+                }
+            }
+            return closestColor;
+        }
+
+        private void kmeansToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (image.Channels() == 4)
+            {
+                MessageBox.Show("only 24 bit images allowed");
+                return;
+            }
+            var d = AutoDialog.DialogHelpers.StartDialog();
+            d.AddIntegerNumericField("k", "K", 8, 12, 2);// Desired number of clusters (colors)
+            d.AddIntegerNumericField("maxCount", "maxCount", 10, 200, 1);
+            d.AddNumericField("eps", "eps", 1.0, 10, 0.01m);
+            d.AddOptionsField("flags", "Flags", Enum.GetNames<KMeansFlags>(), 0);
+            if (!d.ShowDialog())
+                return;
+
+            int K = d.GetIntegerNumericField("k");
+            var eps = d.GetNumericField("eps");
+            var maxCount = d.GetIntegerNumericField("maxCount");
+            var flags = Enum.GetValues<KMeansFlags>()[d.GetOptionsFieldIdx("flags")];
+            /*
+             * # Define criteria = ( type, max_iter = 10 , epsilon = 1.0 )
+criteria = (cv.TERM_CRITERIA_EPS + cv.TERM_CRITERIA_MAX_ITER, 10, 1.0)
+# Set flags (Just to avoid line break in the code)
+flags = cv.KMEANS_RANDOM_CENTERS
+# Apply KMeans
+compactness,labels,centers = cv.kmeans(z,2,None,criteria,10,flags)
+             */  // Reshape the image to a 2D array of pixels (Mx3 for an RGB image)
+                 // Each row is a pixel, and columns are R, G, B values.
+
+          
+            
+            using (Mat samples = image.Reshape(1, image.Rows * image.Cols))
+            {
+                // Convert to float32 for KMeans
+                samples.ConvertTo(samples, MatType.CV_32F);
+                TermCriteria criteria = new TermCriteria(
+                    CriteriaTypes.Eps | CriteriaTypes.MaxIter, maxCount, eps);
+                using (Mat bestLabels = new Mat())
+                using (Mat centers = new Mat())
+                {
+
+                    // Perform K-Means clustering
+                    Cv2.Kmeans(samples, K, bestLabels, criteria, 10, flags, centers);
+
+                    // Convert centers back to uint8 for image representation
+                    centers.ConvertTo(centers, MatType.CV_8U);
+
+                    // Map labels back to the corresponding center colors
+                    Mat result = new Mat(image.Size(), image.Type());
+
+                    for (int i = 0; i < samples.Rows; i++)
+                    {
+                        int label = bestLabels.Get<int>(i);
+                        Vec3b color = centers.Get<Vec3b>(label);
+                        result.Set<Vec3b>(i / image.Cols, i % image.Cols, color);
+                    }
+                    SpawnChild(result);
+
+                }
+            }
+        }
+
+        private void toDominantColorsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (image.Channels() == 4)
+            {
+                MessageBox.Show("only 24 bit images allowed");
+                return;
+            }
+            var d = AutoDialog.DialogHelpers.StartDialog();
+            d.AddIntegerNumericField("k", "K", 8, 12, 2);// Desired number of clusters (colors)
+
+            if (!d.ShowDialog())
+                return;
+
+            int K = d.GetIntegerNumericField("k");
+
+            var dominants = FindDominantColors(image, K);
+            var result = QuantizeToCustomPalette(image, dominants.Select(z => new Vec3b((byte)z.Val0, (byte)z.Val1, (byte)z.Val2)).ToList());
+            SpawnChild(result);
         }
     }
 }

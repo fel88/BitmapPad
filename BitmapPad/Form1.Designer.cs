@@ -78,6 +78,9 @@
             toolStripMenuItem6 = new ToolStripMenuItem();
             toolStripMenuItem7 = new ToolStripMenuItem();
             toolStripMenuItem8 = new ToolStripMenuItem();
+            clusteringToolStripMenuItem = new ToolStripMenuItem();
+            kmeansToolStripMenuItem = new ToolStripMenuItem();
+            toDominantColorsToolStripMenuItem = new ToolStripMenuItem();
             toolStripDropDownButton5 = new ToolStripDropDownButton();
             backColorToolStripMenuItem = new ToolStripMenuItem();
             blackToolStripMenuItem = new ToolStripMenuItem();
@@ -323,28 +326,28 @@
             // blurToolStripMenuItem
             // 
             blurToolStripMenuItem.Name = "blurToolStripMenuItem";
-            blurToolStripMenuItem.Size = new Size(122, 22);
+            blurToolStripMenuItem.Size = new Size(180, 22);
             blurToolStripMenuItem.Text = "blur";
             blurToolStripMenuItem.Click += blurToolStripMenuItem_Click;
             // 
             // bniarizeToolStripMenuItem
             // 
             bniarizeToolStripMenuItem.Name = "bniarizeToolStripMenuItem";
-            bniarizeToolStripMenuItem.Size = new Size(122, 22);
-            bniarizeToolStripMenuItem.Text = "bniarize";
+            bniarizeToolStripMenuItem.Size = new Size(180, 22);
+            bniarizeToolStripMenuItem.Text = "binarize";
             bniarizeToolStripMenuItem.Click += bniarizeToolStripMenuItem_Click;
             // 
             // ditheringToolStripMenuItem
             // 
             ditheringToolStripMenuItem.Name = "ditheringToolStripMenuItem";
-            ditheringToolStripMenuItem.Size = new Size(122, 22);
+            ditheringToolStripMenuItem.Size = new Size(180, 22);
             ditheringToolStripMenuItem.Text = "dithering";
             ditheringToolStripMenuItem.Click += ditheringToolStripMenuItem_Click;
             // 
             // toolStripDropDownButton4
             // 
             toolStripDropDownButton4.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            toolStripDropDownButton4.DropDownItems.AddRange(new ToolStripItem[] { connectedComponentsToolStripMenuItem, sliceToolStripMenuItem, resizeToolStripMenuItem, cropWhiteToolStripMenuItem, inverseToolStripMenuItem, toolStripMenuItem3, toolStripMenuItem6 });
+            toolStripDropDownButton4.DropDownItems.AddRange(new ToolStripItem[] { connectedComponentsToolStripMenuItem, sliceToolStripMenuItem, resizeToolStripMenuItem, cropWhiteToolStripMenuItem, inverseToolStripMenuItem, toolStripMenuItem3, toolStripMenuItem6, clusteringToolStripMenuItem });
             toolStripDropDownButton4.Image = (Image)resources.GetObject("toolStripDropDownButton4.Image");
             toolStripDropDownButton4.ImageTransparentColor = Color.Magenta;
             toolStripDropDownButton4.Name = "toolStripDropDownButton4";
@@ -474,6 +477,27 @@
             toolStripMenuItem8.Text = "horizontal";
             toolStripMenuItem8.Click += toolStripMenuItem8_Click;
             // 
+            // clusteringToolStripMenuItem
+            // 
+            clusteringToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { kmeansToolStripMenuItem, toDominantColorsToolStripMenuItem });
+            clusteringToolStripMenuItem.Name = "clusteringToolStripMenuItem";
+            clusteringToolStripMenuItem.Size = new Size(200, 22);
+            clusteringToolStripMenuItem.Text = "clustering";
+            // 
+            // kmeansToolStripMenuItem
+            // 
+            kmeansToolStripMenuItem.Name = "kmeansToolStripMenuItem";
+            kmeansToolStripMenuItem.Size = new Size(180, 22);
+            kmeansToolStripMenuItem.Text = "k-means";
+            kmeansToolStripMenuItem.Click += kmeansToolStripMenuItem_Click;
+            // 
+            // toDominantColorsToolStripMenuItem
+            // 
+            toDominantColorsToolStripMenuItem.Name = "toDominantColorsToolStripMenuItem";
+            toDominantColorsToolStripMenuItem.Size = new Size(180, 22);
+            toDominantColorsToolStripMenuItem.Text = "to dominant colors";
+            toDominantColorsToolStripMenuItem.Click += toDominantColorsToolStripMenuItem_Click;
+            // 
             // toolStripDropDownButton5
             // 
             toolStripDropDownButton5.DisplayStyle = ToolStripItemDisplayStyle.Text;
@@ -488,28 +512,28 @@
             // 
             backColorToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { blackToolStripMenuItem, whiteToolStripMenuItem1, customToolStripMenuItem1 });
             backColorToolStripMenuItem.Name = "backColorToolStripMenuItem";
-            backColorToolStripMenuItem.Size = new Size(180, 22);
+            backColorToolStripMenuItem.Size = new Size(129, 22);
             backColorToolStripMenuItem.Text = "back color";
             backColorToolStripMenuItem.Click += backColorToolStripMenuItem_Click;
             // 
             // blackToolStripMenuItem
             // 
             blackToolStripMenuItem.Name = "blackToolStripMenuItem";
-            blackToolStripMenuItem.Size = new Size(180, 22);
+            blackToolStripMenuItem.Size = new Size(114, 22);
             blackToolStripMenuItem.Text = "black";
             blackToolStripMenuItem.Click += blackToolStripMenuItem_Click;
             // 
             // whiteToolStripMenuItem1
             // 
             whiteToolStripMenuItem1.Name = "whiteToolStripMenuItem1";
-            whiteToolStripMenuItem1.Size = new Size(180, 22);
+            whiteToolStripMenuItem1.Size = new Size(114, 22);
             whiteToolStripMenuItem1.Text = "white";
             whiteToolStripMenuItem1.Click += whiteToolStripMenuItem1_Click;
             // 
             // customToolStripMenuItem1
             // 
             customToolStripMenuItem1.Name = "customToolStripMenuItem1";
-            customToolStripMenuItem1.Size = new Size(180, 22);
+            customToolStripMenuItem1.Size = new Size(114, 22);
             customToolStripMenuItem1.Text = "custom";
             customToolStripMenuItem1.Click += customToolStripMenuItem1_Click;
             // 
@@ -617,5 +641,8 @@
         private ToolStripMenuItem blackToolStripMenuItem;
         private ToolStripMenuItem whiteToolStripMenuItem1;
         private ToolStripMenuItem customToolStripMenuItem1;
+        private ToolStripMenuItem clusteringToolStripMenuItem;
+        private ToolStripMenuItem kmeansToolStripMenuItem;
+        private ToolStripMenuItem toDominantColorsToolStripMenuItem;
     }
 }
