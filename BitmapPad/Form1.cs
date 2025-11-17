@@ -6,6 +6,7 @@ using OpenCvSharp.XPhoto;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO.Packaging;
 using System.Text;
@@ -18,10 +19,12 @@ namespace BitmapPad
         public Form1()
         {
             InitializeComponent();
+
             pictureBox1.MouseWheel += PictureBox1_MouseWheel;
             pictureBox1.MouseDown += PictureBox1_MouseDown;
             pictureBox1.MouseUp += PictureBox1_MouseUp;
             FormClosing += Form1_FormClosing;
+            BackColor = pictureBox1.BackColor;
         }
 
         private void Form1_FormClosing(object? sender, FormClosingEventArgs e)
@@ -92,7 +95,7 @@ namespace BitmapPad
             }
             var bmp = image.ToBitmap();
             var gr = e.Graphics;
-            gr.Clear(Color.White);
+            gr.Clear(BackColor);
             var p0 = Transform(new PointF(0, 0));
             var p1 = Transform(new PointF(0, 100));
             var p2 = Transform(new PointF(100, 0));
@@ -182,7 +185,7 @@ namespace BitmapPad
         {
             Mat dest = new Mat();
             Cv2.CvtColor(image, dest, ColorConversionCodes.RGB2GRAY);
-            mdi.MainForm.OpenChild(dest);
+            SpawnChild(dest);
 
         }
         public void Init(string path)
@@ -196,8 +199,17 @@ namespace BitmapPad
             Init(image);
         }
 
-        internal void Init(Mat mat)
+        private void ApplySettings(ViewerSettings settings)
         {
+            pictureBox1.BackColor = BackColor = settings.BackColor;
+            pictureBox1.InterpolationMode = settings.InterpolationMode;
+        }
+
+        internal void Init(Mat mat, ViewerSettings settings = null)
+        {
+            if (settings != null)
+                ApplySettings(settings);
+
             image = mat;
             var bmp = image.ToBitmap();
             pictureBox1.Image = bmp;
@@ -252,7 +264,7 @@ namespace BitmapPad
         {
             Mat dest = new Mat();
             Cv2.CvtColor(image, dest, ColorConversionCodes.RGB2HSV);
-            mdi.MainForm.OpenChild(dest);
+            mdi.MainForm.OpenChild(dest, GetViewerSettings());
         }
 
         private void toolStripButton5_Click(object sender, EventArgs e)
@@ -292,7 +304,7 @@ namespace BitmapPad
 
 
 
-            mdi.MainForm.OpenChild(res);
+            SpawnChild(res);
         }
 
         private void toolStripButton6_Click(object sender, EventArgs e)
@@ -319,7 +331,7 @@ namespace BitmapPad
                 return;
             }
             var mats = image.Split();
-            mdi.MainForm.OpenChild(mats.Last());
+            SpawnChild(mats.Last());
         }
 
         private void removeToolStripMenuItem_Click(object sender, EventArgs e)
@@ -332,7 +344,7 @@ namespace BitmapPad
             var mats = image.Split();
             Mat res = new Mat();
             Cv2.Merge(mats.Take(3).ToArray(), res);
-            mdi.MainForm.OpenChild(res);
+            SpawnChild(res);
         }
 
         private void toolStripButton7_Click_1(object sender, EventArgs e)
@@ -342,7 +354,7 @@ namespace BitmapPad
             for (int i = 0; i < mats.Length; i++)
             {
                 Mat? item = mats[i];
-                mdi.MainForm.OpenChild(item, names[i]);
+                mdi.MainForm.OpenChild(item, GetViewerSettings(), names[i]);
             }
         }
 
@@ -372,7 +384,7 @@ namespace BitmapPad
 
             var mode = d.GetOptionsField("mode");
             var ff = (InterpolationFlags)Enum.Parse(typeof(InterpolationFlags), mode);
-            mdi.MainForm.OpenChild(image.Resize(new OpenCvSharp.Size(d.GetNumericField("w"), d.GetNumericField("h")), interpolation: ff));
+            SpawnChild(image.Resize(new OpenCvSharp.Size(d.GetNumericField("w"), d.GetNumericField("h")), interpolation: ff));
         }
 
         private void cropWhiteToolStripMenuItem_Click(object sender, EventArgs e)
@@ -469,14 +481,14 @@ namespace BitmapPad
             var cropped = image.WarpPerspective(ptr, new OpenCvSharp.Size(rect.Size.Width, rect.Size.Height));
             //var cropped = image.WarpAffine(mtr, new OpenCvSharp.Size(rect.Size.Width, rect.Size.Height));            
 
-            mdi.MainForm.OpenChild(cropped);
+            SpawnChild(cropped);
         }
 
         private void inverseToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Mat inversed = new Mat();
             Cv2.BitwiseNot(image, inversed);
-            mdi.MainForm.OpenChild(inversed);
+            SpawnChild(inversed);
         }
 
         private void horizontalToolStripMenuItem_Click(object sender, EventArgs e)
@@ -484,16 +496,21 @@ namespace BitmapPad
             //todo make dialog to select N parts
             var top = new Mat(image, new Rect(0, 0, image.Width, image.Height / 2));
             var bottom = new Mat(image, new Rect(0, image.Height / 2, image.Width, image.Height / 2));
-            mdi.MainForm.OpenChild(top);
-            mdi.MainForm.OpenChild(bottom);
+            SpawnChild(top);
+            SpawnChild(bottom);
+        }
+
+        public void SpawnChild(Mat mat)
+        {
+            mdi.MainForm.OpenChild(mat, GetViewerSettings());
         }
 
         private void verticalToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var left = new Mat(image, new Rect(0, 0, image.Width / 2, image.Height));
             var right = new Mat(image, new Rect(image.Width / 2, 0, image.Width / 2, image.Height));
-            mdi.MainForm.OpenChild(left);
-            mdi.MainForm.OpenChild(right);
+            mdi.MainForm.OpenChild(left, GetViewerSettings());
+            mdi.MainForm.OpenChild(right, GetViewerSettings());
         }
 
         private void whiteToolStripMenuItem_Click(object sender, EventArgs e)
@@ -505,7 +522,7 @@ namespace BitmapPad
             var rect = Cv2.BoundingRect(coords);
             var cropped = image.Clone(rect);
 
-            mdi.MainForm.OpenChild(cropped);
+            SpawnChild(cropped);
         }
 
         private void toolStripMenuItem3_Click(object sender, EventArgs e)
@@ -517,14 +534,14 @@ namespace BitmapPad
         {
             Mat dst = new Mat();
             Cv2.Rotate(image, dst, RotateFlags.Rotate90Counterclockwise);
-            mdi.MainForm.OpenChild(dst);
+            SpawnChild(dst);
         }
 
         private void toolStripMenuItem5_Click(object sender, EventArgs e)
         {
             Mat dst = new Mat();
             Cv2.Rotate(image, dst, RotateFlags.Rotate90Clockwise);
-            mdi.MainForm.OpenChild(dst);
+            SpawnChild(dst);
         }
 
         private void toolStripMenuItem6_Click(object sender, EventArgs e)
@@ -536,14 +553,14 @@ namespace BitmapPad
         {
             Mat dst = new Mat();
             Cv2.Flip(image, dst, FlipMode.Y);
-            mdi.MainForm.OpenChild(dst);
+            SpawnChild(dst);
         }
 
         private void toolStripMenuItem8_Click(object sender, EventArgs e)
         {
             Mat dst = new Mat();
             Cv2.Flip(image, dst, FlipMode.X);
-            mdi.MainForm.OpenChild(dst);
+            SpawnChild(dst);
         }
 
         private void ditheringToolStripMenuItem_Click(object sender, EventArgs e)
@@ -553,7 +570,7 @@ namespace BitmapPad
             using var tt = image.ToBitmap();
             using var res = d.Process(tt);
 
-            mdi.MainForm.OpenChild(res.ToMat());
+            SpawnChild(res.ToMat());
         }
 
         private void customToolStripMenuItem_Click(object sender, EventArgs e)
@@ -571,7 +588,7 @@ namespace BitmapPad
             var ww = image.Width - d.GetIntegerNumericField("right") - xx;
             var hh = image.Height - d.GetIntegerNumericField("bottom") - yy;
             var crop = new Mat(image, new Rect(xx, yy, ww, hh));
-            mdi.MainForm.OpenChild(crop);
+            SpawnChild(crop);
         }
 
         private void blurToolStripMenuItem_Click(object sender, EventArgs e)
@@ -581,7 +598,7 @@ namespace BitmapPad
             if (!d.ShowDialog())
                 return;
 
-            mdi.MainForm.OpenChild(image.Blur(new OpenCvSharp.Size(d.GetNumericField("s"), d.GetNumericField("s"))));
+            SpawnChild(image.Blur(new OpenCvSharp.Size(d.GetNumericField("s"), d.GetNumericField("s"))));
         }
 
         private void bniarizeToolStripMenuItem_Click(object sender, EventArgs e)
@@ -604,7 +621,7 @@ namespace BitmapPad
                 res = image.Threshold(d.GetNumericField("min"), d.GetNumericField("max"), method);
             else
                 res = image.CvtColor(ColorConversionCodes.BGR2GRAY).Threshold(d.GetNumericField("min"), d.GetNumericField("max"), method);
-            mdi.MainForm.OpenChild(res);
+            mdi.MainForm.OpenChild(res, GetViewerSettings());
 
         }
 
@@ -628,8 +645,55 @@ namespace BitmapPad
                 ret.DrawContours(points2.ToArray(), i, Scalar.Blue);
                 ret.DrawMarker(new OpenCvSharp.Point(cx, cy), Scalar.Red);
             }
-            mdi.MainForm.OpenChild(ret);
+            SpawnChild(ret);
+        }
+
+        private void editorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            CropImage cropEditor = new CropImage();
+            cropEditor.Init(image.ToBitmap());
+            if (cropEditor.ShowDialog() != DialogResult.OK)
+                return;
+
+            var ca = cropEditor.CropArea;
+            var crop = new Mat(image, new Rect((int)ca.X, (int)ca.Y, (int)ca.Width, (int)ca.Height));
+            SpawnChild(crop);
+        }
+
+
+        public ViewerSettings GetViewerSettings()
+        {
+            return new ViewerSettings()
+            {
+                BackColor = BackColor,
+                InterpolationMode = pictureBox1.InterpolationMode
+            };
+        }
+
+        Color BackColor;
+        private void backColorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void customToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            ColorDialog cd = new ColorDialog();
+            cd.Color = BackColor;
+            if (cd.ShowDialog() != DialogResult.OK)
+                return;
+
+            pictureBox1.BackColor = BackColor = cd.Color;
+        }
+
+        private void blackToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            pictureBox1.BackColor = BackColor = Color.Black;
+        }
+
+        private void whiteToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            pictureBox1.BackColor = BackColor = Color.White;
         }
     }
-
 }

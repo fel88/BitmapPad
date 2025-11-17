@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.Drawing.Imaging;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -18,14 +20,14 @@ namespace BitmapPad
         public mdi()
         {
             InitializeComponent();
-            MainForm = this; 
+            MainForm = this;
             DragEnter += Form1_DragEnter;
             DragDrop += Form1_DragDrop;
         }
 
         public static mdi MainForm;
 
-        public void OpenChild(Mat mat, string text = null)
+        public void OpenChild(Mat mat, ViewerSettings settings, string text = null)
         {
             Form1 f = new Form1();
             if (text != null)
@@ -33,10 +35,9 @@ namespace BitmapPad
                 f.Text = text;
             }
             f.MdiParent = this;
-            f.Init(mat);
+            f.Init(mat, settings);
             f.Show();
         }
-
         private void cascadeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             LayoutMdi(MdiLayout.Cascade);
@@ -75,7 +76,7 @@ namespace BitmapPad
         }
 
         private void Open(string path)
-        {           
+        {
             Form1 f = new Form1();
             f.MdiParent = this;
             f.Init(path);
@@ -88,15 +89,33 @@ namespace BitmapPad
             if (ofd.ShowDialog() != DialogResult.OK)
                 return;
 
-            Open(ofd.FileName);            
+            Open(ofd.FileName);
         }
 
         private void clipboardToolStripMenuItem_Click(object sender, EventArgs e)
-        {            
+        {
             Form1 f = new Form1();
             f.MdiParent = this;
             var bmp = ((Bitmap)Clipboard.GetImage()).ToMat();
             f.Init(bmp);
+            f.Show();
+        }
+
+        private void screenshotToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Rectangle bounds = Screen.GetBounds(System.Drawing.Point.Empty);
+            Bitmap bitmap = new Bitmap(bounds.Width, bounds.Height);
+
+            using (Graphics g = Graphics.FromImage(bitmap))
+            {
+                g.CopyFromScreen(0, 0, 0, 0, Screen.PrimaryScreen.Bounds.Size);
+            }
+
+
+
+            Form1 f = new Form1();
+            f.MdiParent = this;
+            f.Init(bitmap.ToMat());
             f.Show();
         }
     }

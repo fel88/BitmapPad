@@ -29,115 +29,124 @@
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(mdi));
-            this.toolStrip1 = new System.Windows.Forms.ToolStrip();
-            this.toolStripDropDownButton1 = new System.Windows.Forms.ToolStripDropDownButton();
-            this.cascadeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.tileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.horizontalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.arrangeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripDropDownButton2 = new System.Windows.Forms.ToolStripDropDownButton();
-            this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.clipboardToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStrip1.SuspendLayout();
-            this.SuspendLayout();
+            toolStrip1 = new ToolStrip();
+            toolStripDropDownButton1 = new ToolStripDropDownButton();
+            cascadeToolStripMenuItem = new ToolStripMenuItem();
+            tileToolStripMenuItem = new ToolStripMenuItem();
+            horizontalToolStripMenuItem = new ToolStripMenuItem();
+            arrangeToolStripMenuItem = new ToolStripMenuItem();
+            toolStripDropDownButton2 = new ToolStripDropDownButton();
+            fileToolStripMenuItem = new ToolStripMenuItem();
+            clipboardToolStripMenuItem = new ToolStripMenuItem();
+            toolStripDropDownButton3 = new ToolStripDropDownButton();
+            screenshotToolStripMenuItem = new ToolStripMenuItem();
+            toolStrip1.SuspendLayout();
+            SuspendLayout();
             // 
             // toolStrip1
             // 
-            this.toolStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
-            this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.toolStripDropDownButton1,
-            this.toolStripDropDownButton2});
-            this.toolStrip1.Location = new System.Drawing.Point(0, 0);
-            this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(918, 25);
-            this.toolStrip1.TabIndex = 1;
-            this.toolStrip1.Text = "toolStrip1";
+            toolStrip1.ImageScalingSize = new Size(20, 20);
+            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripDropDownButton1, toolStripDropDownButton2, toolStripDropDownButton3 });
+            toolStrip1.Location = new Point(0, 0);
+            toolStrip1.Name = "toolStrip1";
+            toolStrip1.Size = new Size(1000, 27);
+            toolStrip1.TabIndex = 1;
+            toolStrip1.Text = "toolStrip1";
             // 
             // toolStripDropDownButton1
             // 
-            this.toolStripDropDownButton1.Alignment = System.Windows.Forms.ToolStripItemAlignment.Right;
-            this.toolStripDropDownButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripDropDownButton1.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.cascadeToolStripMenuItem,
-            this.tileToolStripMenuItem,
-            this.horizontalToolStripMenuItem,
-            this.arrangeToolStripMenuItem});
-            this.toolStripDropDownButton1.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton1.Image")));
-            this.toolStripDropDownButton1.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripDropDownButton1.Name = "toolStripDropDownButton1";
-            this.toolStripDropDownButton1.Size = new System.Drawing.Size(69, 22);
-            this.toolStripDropDownButton1.Text = "Windows";
+            toolStripDropDownButton1.Alignment = ToolStripItemAlignment.Right;
+            toolStripDropDownButton1.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            toolStripDropDownButton1.DropDownItems.AddRange(new ToolStripItem[] { cascadeToolStripMenuItem, tileToolStripMenuItem, horizontalToolStripMenuItem, arrangeToolStripMenuItem });
+            toolStripDropDownButton1.Image = (Image)resources.GetObject("toolStripDropDownButton1.Image");
+            toolStripDropDownButton1.ImageTransparentColor = Color.Magenta;
+            toolStripDropDownButton1.Name = "toolStripDropDownButton1";
+            toolStripDropDownButton1.Size = new Size(69, 24);
+            toolStripDropDownButton1.Text = "Windows";
             // 
             // cascadeToolStripMenuItem
             // 
-            this.cascadeToolStripMenuItem.Name = "cascadeToolStripMenuItem";
-            this.cascadeToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
-            this.cascadeToolStripMenuItem.Text = "Cascade";
-            this.cascadeToolStripMenuItem.Click += new System.EventHandler(this.cascadeToolStripMenuItem_Click);
+            cascadeToolStripMenuItem.Name = "cascadeToolStripMenuItem";
+            cascadeToolStripMenuItem.Size = new Size(129, 22);
+            cascadeToolStripMenuItem.Text = "Cascade";
+            cascadeToolStripMenuItem.Click += cascadeToolStripMenuItem_Click;
             // 
             // tileToolStripMenuItem
             // 
-            this.tileToolStripMenuItem.Name = "tileToolStripMenuItem";
-            this.tileToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
-            this.tileToolStripMenuItem.Text = "Vertical";
-            this.tileToolStripMenuItem.Click += new System.EventHandler(this.tileToolStripMenuItem_Click);
+            tileToolStripMenuItem.Name = "tileToolStripMenuItem";
+            tileToolStripMenuItem.Size = new Size(129, 22);
+            tileToolStripMenuItem.Text = "Vertical";
+            tileToolStripMenuItem.Click += tileToolStripMenuItem_Click;
             // 
             // horizontalToolStripMenuItem
             // 
-            this.horizontalToolStripMenuItem.Name = "horizontalToolStripMenuItem";
-            this.horizontalToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
-            this.horizontalToolStripMenuItem.Text = "Horizontal";
-            this.horizontalToolStripMenuItem.Click += new System.EventHandler(this.horizontalToolStripMenuItem_Click);
+            horizontalToolStripMenuItem.Name = "horizontalToolStripMenuItem";
+            horizontalToolStripMenuItem.Size = new Size(129, 22);
+            horizontalToolStripMenuItem.Text = "Horizontal";
+            horizontalToolStripMenuItem.Click += horizontalToolStripMenuItem_Click;
             // 
             // arrangeToolStripMenuItem
             // 
-            this.arrangeToolStripMenuItem.Name = "arrangeToolStripMenuItem";
-            this.arrangeToolStripMenuItem.Size = new System.Drawing.Size(129, 22);
-            this.arrangeToolStripMenuItem.Text = "Arrange";
-            this.arrangeToolStripMenuItem.Click += new System.EventHandler(this.arrangeToolStripMenuItem_Click);
+            arrangeToolStripMenuItem.Name = "arrangeToolStripMenuItem";
+            arrangeToolStripMenuItem.Size = new Size(129, 22);
+            arrangeToolStripMenuItem.Text = "Arrange";
+            arrangeToolStripMenuItem.Click += arrangeToolStripMenuItem_Click;
             // 
             // toolStripDropDownButton2
             // 
-            this.toolStripDropDownButton2.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.toolStripDropDownButton2.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.fileToolStripMenuItem,
-            this.clipboardToolStripMenuItem});
-            this.toolStripDropDownButton2.Image = ((System.Drawing.Image)(resources.GetObject("toolStripDropDownButton2.Image")));
-            this.toolStripDropDownButton2.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.toolStripDropDownButton2.Name = "toolStripDropDownButton2";
-            this.toolStripDropDownButton2.Size = new System.Drawing.Size(46, 22);
-            this.toolStripDropDownButton2.Text = "Load";
+            toolStripDropDownButton2.DropDownItems.AddRange(new ToolStripItem[] { fileToolStripMenuItem, clipboardToolStripMenuItem });
+            toolStripDropDownButton2.Image = Properties.Resources.image;
+            toolStripDropDownButton2.ImageTransparentColor = Color.Magenta;
+            toolStripDropDownButton2.Name = "toolStripDropDownButton2";
+            toolStripDropDownButton2.Size = new Size(66, 24);
+            toolStripDropDownButton2.Text = "Load";
             // 
             // fileToolStripMenuItem
             // 
-            this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            this.fileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.fileToolStripMenuItem.Text = "File";
-            this.fileToolStripMenuItem.Click += new System.EventHandler(this.fileToolStripMenuItem_Click);
+            fileToolStripMenuItem.Name = "fileToolStripMenuItem";
+            fileToolStripMenuItem.Size = new Size(180, 22);
+            fileToolStripMenuItem.Text = "File";
+            fileToolStripMenuItem.Click += fileToolStripMenuItem_Click;
             // 
             // clipboardToolStripMenuItem
             // 
-            this.clipboardToolStripMenuItem.Name = "clipboardToolStripMenuItem";
-            this.clipboardToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.clipboardToolStripMenuItem.Text = "Clipboard";
-            this.clipboardToolStripMenuItem.Click += new System.EventHandler(this.clipboardToolStripMenuItem_Click);
+            clipboardToolStripMenuItem.Name = "clipboardToolStripMenuItem";
+            clipboardToolStripMenuItem.Size = new Size(180, 22);
+            clipboardToolStripMenuItem.Text = "Clipboard";
+            clipboardToolStripMenuItem.Click += clipboardToolStripMenuItem_Click;
+            // 
+            // toolStripDropDownButton3
+            // 
+            toolStripDropDownButton3.DropDownItems.AddRange(new ToolStripItem[] { screenshotToolStripMenuItem });
+            toolStripDropDownButton3.Image = Properties.Resources.webcam;
+            toolStripDropDownButton3.ImageTransparentColor = Color.Magenta;
+            toolStripDropDownButton3.Name = "toolStripDropDownButton3";
+            toolStripDropDownButton3.Size = new Size(82, 24);
+            toolStripDropDownButton3.Text = "Capture";
+            // 
+            // screenshotToolStripMenuItem
+            // 
+            screenshotToolStripMenuItem.Name = "screenshotToolStripMenuItem";
+            screenshotToolStripMenuItem.Size = new Size(180, 22);
+            screenshotToolStripMenuItem.Text = "screenshot";
+            screenshotToolStripMenuItem.Click += screenshotToolStripMenuItem_Click;
             // 
             // mdi
             // 
-            this.AllowDrop = true;
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(918, 415);
-            this.Controls.Add(this.toolStrip1);
-            this.IsMdiContainer = true;
-            this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.Name = "mdi";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "BitmapPad";
-            this.toolStrip1.ResumeLayout(false);
-            this.toolStrip1.PerformLayout();
-            this.ResumeLayout(false);
-            this.PerformLayout();
+            AllowDrop = true;
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(1000, 486);
+            Controls.Add(toolStrip1);
+            IsMdiContainer = true;
+            Margin = new Padding(3, 2, 3, 2);
+            Name = "mdi";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "BitmapPad";
+            toolStrip1.ResumeLayout(false);
+            toolStrip1.PerformLayout();
+            ResumeLayout(false);
+            PerformLayout();
 
         }
 
@@ -152,5 +161,7 @@
         private ToolStripDropDownButton toolStripDropDownButton2;
         private ToolStripMenuItem fileToolStripMenuItem;
         private ToolStripMenuItem clipboardToolStripMenuItem;
+        private ToolStripDropDownButton toolStripDropDownButton3;
+        private ToolStripMenuItem screenshotToolStripMenuItem;
     }
 }
