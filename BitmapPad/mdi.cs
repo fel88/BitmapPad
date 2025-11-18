@@ -75,14 +75,20 @@ namespace BitmapPad
 
         }
 
-        private void Open(string path)
+        public void Open(string path)
         {
             Form1 f = new Form1();
             f.MdiParent = this;
             f.Init(path);
             f.Show();
         }
-
+        public void Open(Mat mat)
+        {
+            Form1 f = new Form1();
+            f.MdiParent = this;
+            f.Init(mat);
+            f.Show();
+        }
         private void fileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             OpenFileDialog ofd = new OpenFileDialog();
@@ -116,6 +122,13 @@ namespace BitmapPad
             Form1 f = new Form1();
             f.MdiParent = this;
             f.Init(bitmap.ToMat());
+            f.Show();
+        }
+
+        private void newToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PipelineNodeEditor f = new PipelineNodeEditor();
+            f.MdiParent = this;            
             f.Show();
         }
     }

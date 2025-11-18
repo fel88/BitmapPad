@@ -46,6 +46,7 @@
             asMonochrome1BitToolStripMenuItem = new ToolStripMenuItem();
             toolStripMenuItem1 = new ToolStripMenuItem();
             toolStripMenuItem2 = new ToolStripMenuItem();
+            setCaptionToolStripMenuItem = new ToolStripMenuItem();
             toolStripButton1 = new ToolStripButton();
             toolStripButton2 = new ToolStripButton();
             toolStripButton3 = new ToolStripButton();
@@ -53,13 +54,17 @@
             toolStripButton5 = new ToolStripDropDownButton();
             rangeToolStripMenuItem = new ToolStripMenuItem();
             replaceColorToolStripMenuItem = new ToolStripMenuItem();
+            binarizeWithDominantToolStripMenuItem = new ToolStripMenuItem();
+            brightnessToolStripMenuItem = new ToolStripMenuItem();
             toolStripDropDownButton6 = new ToolStripDropDownButton();
             generalToolStripMenuItem = new ToolStripMenuItem();
             colorsToolStripMenuItem = new ToolStripMenuItem();
             toolStripDropDownButton2 = new ToolStripDropDownButton();
             extractToolStripMenuItem = new ToolStripMenuItem();
             removeToolStripMenuItem = new ToolStripMenuItem();
-            toolStripButton7 = new ToolStripButton();
+            toolStripButton7 = new ToolStripDropDownButton();
+            splitToolStripMenuItem = new ToolStripMenuItem();
+            to32BitToolStripMenuItem = new ToolStripMenuItem();
             toolStripDropDownButton3 = new ToolStripDropDownButton();
             blurToolStripMenuItem = new ToolStripMenuItem();
             bniarizeToolStripMenuItem = new ToolStripMenuItem();
@@ -93,7 +98,8 @@
             statusStrip1 = new StatusStrip();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             timer1 = new System.Windows.Forms.Timer(components);
-            binarizeWithDominantToolStripMenuItem = new ToolStripMenuItem();
+            morphologyToolStripMenuItem = new ToolStripMenuItem();
+            erodeToolStripMenuItem = new ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)pictureBox1).BeginInit();
             contextMenuStrip1.SuspendLayout();
             toolStrip1.SuspendLayout();
@@ -109,7 +115,7 @@
             pictureBox1.Location = new Point(0, 27);
             pictureBox1.Margin = new Padding(3, 2, 3, 2);
             pictureBox1.Name = "pictureBox1";
-            pictureBox1.Size = new Size(776, 289);
+            pictureBox1.Size = new Size(799, 330);
             pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
             pictureBox1.TabIndex = 0;
             pictureBox1.TabStop = false;
@@ -174,14 +180,14 @@
             toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripDropDownButton1, toolStripButton1, toolStripButton2, toolStripButton3, toolStripButton4, toolStripButton5, toolStripDropDownButton6, toolStripDropDownButton2, toolStripButton7, toolStripDropDownButton3, toolStripDropDownButton4, toolStripDropDownButton5 });
             toolStrip1.Location = new Point(0, 0);
             toolStrip1.Name = "toolStrip1";
-            toolStrip1.Size = new Size(776, 27);
+            toolStrip1.Size = new Size(799, 27);
             toolStrip1.TabIndex = 1;
             toolStrip1.Text = "toolStrip1";
             // 
             // toolStripDropDownButton1
             // 
             toolStripDropDownButton1.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            toolStripDropDownButton1.DropDownItems.AddRange(new ToolStripItem[] { saveToolStripMenuItem, exportToolStripMenuItem });
+            toolStripDropDownButton1.DropDownItems.AddRange(new ToolStripItem[] { saveToolStripMenuItem, exportToolStripMenuItem, setCaptionToolStripMenuItem });
             toolStripDropDownButton1.Image = (Image)resources.GetObject("toolStripDropDownButton1.Image");
             toolStripDropDownButton1.ImageTransparentColor = Color.Magenta;
             toolStripDropDownButton1.Name = "toolStripDropDownButton1";
@@ -190,8 +196,9 @@
             // 
             // saveToolStripMenuItem
             // 
+            saveToolStripMenuItem.Image = Properties.Resources.disk_black;
             saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            saveToolStripMenuItem.Size = new Size(108, 22);
+            saveToolStripMenuItem.Size = new Size(133, 22);
             saveToolStripMenuItem.Text = "Save";
             saveToolStripMenuItem.Click += saveToolStripMenuItem_Click;
             // 
@@ -199,7 +206,7 @@
             // 
             exportToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { asMonochrome1BitToolStripMenuItem, toolStripMenuItem1 });
             exportToolStripMenuItem.Name = "exportToolStripMenuItem";
-            exportToolStripMenuItem.Size = new Size(108, 22);
+            exportToolStripMenuItem.Size = new Size(133, 22);
             exportToolStripMenuItem.Text = "Export";
             // 
             // asMonochrome1BitToolStripMenuItem
@@ -223,6 +230,14 @@
             toolStripMenuItem2.Size = new Size(102, 22);
             toolStripMenuItem2.Text = "ASCII";
             toolStripMenuItem2.Click += toolStripMenuItem2_Click;
+            // 
+            // setCaptionToolStripMenuItem
+            // 
+            setCaptionToolStripMenuItem.Image = Properties.Resources.infocard;
+            setCaptionToolStripMenuItem.Name = "setCaptionToolStripMenuItem";
+            setCaptionToolStripMenuItem.Size = new Size(133, 22);
+            setCaptionToolStripMenuItem.Text = "Set caption";
+            setCaptionToolStripMenuItem.Click += setCaptionToolStripMenuItem_Click;
             // 
             // toolStripButton1
             // 
@@ -265,12 +280,11 @@
             // 
             // toolStripButton5
             // 
-            toolStripButton5.DisplayStyle = ToolStripItemDisplayStyle.Text;
-            toolStripButton5.DropDownItems.AddRange(new ToolStripItem[] { rangeToolStripMenuItem, replaceColorToolStripMenuItem, binarizeWithDominantToolStripMenuItem });
-            toolStripButton5.Image = (Image)resources.GetObject("toolStripButton5.Image");
+            toolStripButton5.DropDownItems.AddRange(new ToolStripItem[] { rangeToolStripMenuItem, replaceColorToolStripMenuItem, binarizeWithDominantToolStripMenuItem, brightnessToolStripMenuItem });
+            toolStripButton5.Image = Properties.Resources.color;
             toolStripButton5.ImageTransparentColor = Color.Magenta;
             toolStripButton5.Name = "toolStripButton5";
-            toolStripButton5.Size = new Size(52, 24);
+            toolStripButton5.Size = new Size(72, 24);
             toolStripButton5.Text = "colors";
             toolStripButton5.Click += toolStripButton5_Click;
             // 
@@ -287,6 +301,20 @@
             replaceColorToolStripMenuItem.Size = new Size(196, 22);
             replaceColorToolStripMenuItem.Text = "replace color";
             replaceColorToolStripMenuItem.Click += replaceColorToolStripMenuItem_Click;
+            // 
+            // binarizeWithDominantToolStripMenuItem
+            // 
+            binarizeWithDominantToolStripMenuItem.Name = "binarizeWithDominantToolStripMenuItem";
+            binarizeWithDominantToolStripMenuItem.Size = new Size(196, 22);
+            binarizeWithDominantToolStripMenuItem.Text = "binarize with dominant";
+            binarizeWithDominantToolStripMenuItem.Click += binarizeWithDominantToolStripMenuItem_Click;
+            // 
+            // brightnessToolStripMenuItem
+            // 
+            brightnessToolStripMenuItem.Name = "brightnessToolStripMenuItem";
+            brightnessToolStripMenuItem.Size = new Size(196, 22);
+            brightnessToolStripMenuItem.Text = "brightness";
+            brightnessToolStripMenuItem.Click += brightnessToolStripMenuItem_Click;
             // 
             // toolStripDropDownButton6
             // 
@@ -338,12 +366,27 @@
             // toolStripButton7
             // 
             toolStripButton7.DisplayStyle = ToolStripItemDisplayStyle.Text;
+            toolStripButton7.DropDownItems.AddRange(new ToolStripItem[] { splitToolStripMenuItem, to32BitToolStripMenuItem });
             toolStripButton7.Image = (Image)resources.GetObject("toolStripButton7.Image");
             toolStripButton7.ImageTransparentColor = Color.Magenta;
             toolStripButton7.Name = "toolStripButton7";
-            toolStripButton7.Size = new Size(83, 24);
-            toolStripButton7.Text = "split channels";
+            toolStripButton7.Size = new Size(67, 24);
+            toolStripButton7.Text = "channels";
             toolStripButton7.Click += toolStripButton7_Click_1;
+            // 
+            // splitToolStripMenuItem
+            // 
+            splitToolStripMenuItem.Name = "splitToolStripMenuItem";
+            splitToolStripMenuItem.Size = new Size(172, 22);
+            splitToolStripMenuItem.Text = "split";
+            splitToolStripMenuItem.Click += splitToolStripMenuItem_Click;
+            // 
+            // to32BitToolStripMenuItem
+            // 
+            to32BitToolStripMenuItem.Name = "to32BitToolStripMenuItem";
+            to32BitToolStripMenuItem.Size = new Size(172, 22);
+            to32BitToolStripMenuItem.Text = "grayscale to 24  bit";
+            to32BitToolStripMenuItem.Click += to32BitToolStripMenuItem_Click;
             // 
             // toolStripDropDownButton3
             // 
@@ -378,7 +421,7 @@
             // 
             // toolStripDropDownButton4
             // 
-            toolStripDropDownButton4.DropDownItems.AddRange(new ToolStripItem[] { connectedComponentsToolStripMenuItem, sliceToolStripMenuItem, resizeToolStripMenuItem, cropWhiteToolStripMenuItem, inverseToolStripMenuItem, toolStripMenuItem3, toolStripMenuItem6, clusteringToolStripMenuItem });
+            toolStripDropDownButton4.DropDownItems.AddRange(new ToolStripItem[] { connectedComponentsToolStripMenuItem, sliceToolStripMenuItem, resizeToolStripMenuItem, cropWhiteToolStripMenuItem, inverseToolStripMenuItem, toolStripMenuItem3, toolStripMenuItem6, clusteringToolStripMenuItem, morphologyToolStripMenuItem });
             toolStripDropDownButton4.Image = Properties.Resources.screwdriver;
             toolStripDropDownButton4.ImageTransparentColor = Color.Magenta;
             toolStripDropDownButton4.Name = "toolStripDropDownButton4";
@@ -572,10 +615,10 @@
             // 
             statusStrip1.ImageScalingSize = new Size(20, 20);
             statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel1 });
-            statusStrip1.Location = new Point(0, 316);
+            statusStrip1.Location = new Point(0, 357);
             statusStrip1.Name = "statusStrip1";
             statusStrip1.Padding = new Padding(1, 0, 12, 0);
-            statusStrip1.Size = new Size(776, 22);
+            statusStrip1.Size = new Size(799, 22);
             statusStrip1.TabIndex = 2;
             statusStrip1.Text = "statusStrip1";
             // 
@@ -591,18 +634,25 @@
             timer1.Interval = 25;
             timer1.Tick += timer1_Tick;
             // 
-            // binarizeWithDominantToolStripMenuItem
+            // morphologyToolStripMenuItem
             // 
-            binarizeWithDominantToolStripMenuItem.Name = "binarizeWithDominantToolStripMenuItem";
-            binarizeWithDominantToolStripMenuItem.Size = new Size(196, 22);
-            binarizeWithDominantToolStripMenuItem.Text = "binarize with dominant";
-            binarizeWithDominantToolStripMenuItem.Click += binarizeWithDominantToolStripMenuItem_Click;
+            morphologyToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { erodeToolStripMenuItem });
+            morphologyToolStripMenuItem.Name = "morphologyToolStripMenuItem";
+            morphologyToolStripMenuItem.Size = new Size(200, 22);
+            morphologyToolStripMenuItem.Text = "morphology";
+            // 
+            // erodeToolStripMenuItem
+            // 
+            erodeToolStripMenuItem.Name = "erodeToolStripMenuItem";
+            erodeToolStripMenuItem.Size = new Size(180, 22);
+            erodeToolStripMenuItem.Text = "erode";
+            erodeToolStripMenuItem.Click += erodeToolStripMenuItem_Click;
             // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(776, 338);
+            ClientSize = new Size(799, 379);
             Controls.Add(pictureBox1);
             Controls.Add(toolStrip1);
             Controls.Add(statusStrip1);
@@ -639,7 +689,6 @@
         private ToolStripDropDownButton toolStripDropDownButton2;
         private ToolStripMenuItem extractToolStripMenuItem;
         private ToolStripMenuItem removeToolStripMenuItem;
-        private ToolStripButton toolStripButton7;
         private ToolStripDropDownButton toolStripDropDownButton3;
         private ToolStripMenuItem blurToolStripMenuItem;
         private ToolStripMenuItem bniarizeToolStripMenuItem;
@@ -687,5 +736,12 @@
         private ToolStripMenuItem rangeToolStripMenuItem;
         private ToolStripMenuItem replaceColorToolStripMenuItem;
         private ToolStripMenuItem binarizeWithDominantToolStripMenuItem;
+        private ToolStripDropDownButton toolStripButton7;
+        private ToolStripMenuItem splitToolStripMenuItem;
+        private ToolStripMenuItem to32BitToolStripMenuItem;
+        private ToolStripMenuItem brightnessToolStripMenuItem;
+        private ToolStripMenuItem setCaptionToolStripMenuItem;
+        private ToolStripMenuItem morphologyToolStripMenuItem;
+        private ToolStripMenuItem erodeToolStripMenuItem;
     }
 }

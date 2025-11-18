@@ -40,13 +40,15 @@
             clipboardToolStripMenuItem = new ToolStripMenuItem();
             toolStripDropDownButton3 = new ToolStripDropDownButton();
             screenshotToolStripMenuItem = new ToolStripMenuItem();
+            toolStripButton1 = new ToolStripDropDownButton();
+            newToolStripMenuItem = new ToolStripMenuItem();
             toolStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // toolStrip1
             // 
             toolStrip1.ImageScalingSize = new Size(20, 20);
-            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripDropDownButton1, toolStripDropDownButton2, toolStripDropDownButton3 });
+            toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripDropDownButton1, toolStripDropDownButton2, toolStripButton1, toolStripDropDownButton3 });
             toolStrip1.Location = new Point(0, 0);
             toolStrip1.Name = "toolStrip1";
             toolStrip1.Size = new Size(1000, 27);
@@ -103,15 +105,17 @@
             // 
             // fileToolStripMenuItem
             // 
+            fileToolStripMenuItem.Image = Properties.Resources.folder;
             fileToolStripMenuItem.Name = "fileToolStripMenuItem";
-            fileToolStripMenuItem.Size = new Size(180, 22);
+            fileToolStripMenuItem.Size = new Size(126, 22);
             fileToolStripMenuItem.Text = "File";
             fileToolStripMenuItem.Click += fileToolStripMenuItem_Click;
             // 
             // clipboardToolStripMenuItem
             // 
+            clipboardToolStripMenuItem.Image = Properties.Resources.clipboard;
             clipboardToolStripMenuItem.Name = "clipboardToolStripMenuItem";
-            clipboardToolStripMenuItem.Size = new Size(180, 22);
+            clipboardToolStripMenuItem.Size = new Size(126, 22);
             clipboardToolStripMenuItem.Text = "Clipboard";
             clipboardToolStripMenuItem.Click += clipboardToolStripMenuItem_Click;
             // 
@@ -127,9 +131,25 @@
             // screenshotToolStripMenuItem
             // 
             screenshotToolStripMenuItem.Name = "screenshotToolStripMenuItem";
-            screenshotToolStripMenuItem.Size = new Size(180, 22);
+            screenshotToolStripMenuItem.Size = new Size(131, 22);
             screenshotToolStripMenuItem.Text = "screenshot";
             screenshotToolStripMenuItem.Click += screenshotToolStripMenuItem_Click;
+            // 
+            // toolStripButton1
+            // 
+            toolStripButton1.DropDownItems.AddRange(new ToolStripItem[] { newToolStripMenuItem });
+            toolStripButton1.Image = Properties.Resources.category;
+            toolStripButton1.ImageTransparentColor = Color.Magenta;
+            toolStripButton1.Name = "toolStripButton1";
+            toolStripButton1.Size = new Size(82, 24);
+            toolStripButton1.Text = "Pipeline";
+            // 
+            // newToolStripMenuItem
+            // 
+            newToolStripMenuItem.Name = "newToolStripMenuItem";
+            newToolStripMenuItem.Size = new Size(180, 22);
+            newToolStripMenuItem.Text = "New";
+            newToolStripMenuItem.Click += newToolStripMenuItem_Click;
             // 
             // mdi
             // 
@@ -163,5 +183,7 @@
         private ToolStripMenuItem clipboardToolStripMenuItem;
         private ToolStripDropDownButton toolStripDropDownButton3;
         private ToolStripMenuItem screenshotToolStripMenuItem;
+        private ToolStripDropDownButton toolStripButton1;
+        private ToolStripMenuItem newToolStripMenuItem;
     }
 }

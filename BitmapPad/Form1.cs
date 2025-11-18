@@ -172,6 +172,7 @@ namespace BitmapPad
 
 
         Mat image;
+        public Mat Image => image;
 
         private void toolStripButton1_Click(object sender, EventArgs e)
         {
@@ -309,13 +310,7 @@ namespace BitmapPad
 
         private void toolStripButton7_Click_1(object sender, EventArgs e)
         {
-            var mats = image.Split();
-            string[] names = new string[] { "red", "green", "blue", "alpha" };
-            for (int i = 0; i < mats.Length; i++)
-            {
-                Mat? item = mats[i];
-                mdi.MainForm.OpenChild(item, GetViewerSettings(), names[i]);
-            }
+
         }
 
         private void sliceToolStripMenuItem_Click(object sender, EventArgs e)
@@ -973,7 +968,8 @@ compactness,labels,centers = cv.kmeans(z,2,None,criteria,10,flags)
 
             var inverse = d.GetBoolField("inverse");
 
-            var colorToMatch = clrs[0].Color;
+            var colorToMatch = clrs[inverse ? 1 : 0].Color;
+
             var r = colorToMatch.Item2;
             var g = colorToMatch.Item1;
             var b = colorToMatch.Item0;
@@ -1001,6 +997,64 @@ compactness,labels,centers = cv.kmeans(z,2,None,criteria,10,flags)
         private void ShowError(string v)
         {
             MessageBox.Show(v, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+
+        private void splitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var mats = image.Split();
+            string[] names = new string[] { "red", "green", "blue", "alpha" };
+            for (int i = 0; i < mats.Length; i++)
+            {
+                Mat? item = mats[i];
+                mdi.MainForm.OpenChild(item, GetViewerSettings(), names[i]);
+            }
+        }
+
+        private void to32BitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            SpawnChild(image.CvtColor(ColorConversionCodes.GRAY2BGR));
+        }
+
+        private void brightnessToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            //# Define brightness adjustment value (e.g., +50 for brighter, -50 for darker)
+            double brightness_value = 50;
+
+            var d = DialogHelpers.StartDialog();
+            d.AddNumericField("value", "Value", brightness_value);
+            if (!d.ShowDialog())
+                return;
+
+            brightness_value = d.GetNumericField("value");
+
+            //# Adjust brightness using cv2.convertScaleAbs()
+            //# alpha=1.0 for no contrast change, beta=brightness_value for brightness adjustment
+            Mat brightened_image = new Mat();
+            Cv2.ConvertScaleAbs(image, brightened_image, 1.0, brightness_value);
+            SpawnChild(brightened_image);
+
+        }
+
+        private void setCaptionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var d = DialogHelpers.StartDialog();
+            d.AddStringField("caption", "Caption", Text);
+            if (!d.ShowDialog())
+                return;
+
+            Text = d.GetStringField("caption");
+        }
+
+        private void erodeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Mat dest = new Mat(); 
+            OpenCvSharp.Size kernelSize = new OpenCvSharp.Size(3, 3);
+            Scalar fillValue = new Scalar (1);
+            Mat kernel = new Mat(kernelSize, MatType.CV_16SC1, fillValue);
+            OpenCvSharp.InputArray kernelArr = OpenCvSharp.InputArray.Create(kernel);
+
+            Cv2.Erode(image, dest, kernelArr);
+            SpawnChild(dest);
         }
     }
 }
