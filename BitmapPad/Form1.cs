@@ -9,6 +9,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO.Packaging;
+using System.Net.Http.Headers;
 using System.Text;
 using static System.Windows.Forms.AxHost;
 
@@ -269,58 +270,11 @@ namespace BitmapPad
 
         private void toolStripButton5_Click(object sender, EventArgs e)
         {
-            var d = AutoDialog.DialogHelpers.StartDialog();
-            //InRangeS(imgHSV, cvScalar(20, 100, 100), cvScalar(30, 255, 255), imgThreshed)
-            d.AddNumericField("r1", "red min", 20);
-            d.AddNumericField("g1", "green min", 100);
-            d.AddNumericField("b1", "blue min", 100);
-            d.AddNumericField("r2", "red max", 30);
-            d.AddNumericField("g2", "green max", 255);
-            d.AddNumericField("b2", "blue max", 255);
-            d.AddBoolField("hsv", "HSV");
-            if (!d.ShowDialog())
-                return;
 
-            Mat temp = null;
-            Mat res = null;
-            if (d.GetBoolField("hsv"))
-            {
-                temp = image.CvtColor(ColorConversionCodes.BGR2HSV);
-                res = temp.InRange(new Scalar(d.GetNumericField("r1"),
-             d.GetNumericField("g1"),
-             d.GetNumericField("b1")),
-             new Scalar(d.GetNumericField("r2"),
-             d.GetNumericField("g2"), d.GetNumericField("b2")));
-            }
-            else
-            {
-                temp = image.Clone();
-                res = temp.InRange(new Scalar(d.GetNumericField("b1"),
-             d.GetNumericField("g1"),
-             d.GetNumericField("r1")),
-             new Scalar(d.GetNumericField("b2"),
-             d.GetNumericField("g2"), d.GetNumericField("r2")));
-            }
-
-
-
-            SpawnChild(res);
         }
 
         private void toolStripButton6_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Resolution: " + image.Size() + Environment.NewLine + "Channels: " + image.Channels() +
-                $"{Environment.NewLine}Aspect: {Math.Round((double)image.Width / image.Height, 4)}");
-        }
-
-        private void toolStripButton7_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void toolStripButton8_Click(object sender, EventArgs e)
-        {
-
         }
 
         private void extractToolStripMenuItem_Click(object sender, EventArgs e)
@@ -341,10 +295,16 @@ namespace BitmapPad
                 MessageBox.Show("Image should contains 4 channels");
                 return;
             }
+
+            SpawnChild(RemoveAlpha(image));
+        }
+
+        Mat RemoveAlpha(Mat image)
+        {
             var mats = image.Split();
             Mat res = new Mat();
             Cv2.Merge(mats.Take(3).ToArray(), res);
-            SpawnChild(res);
+            return res;
         }
 
         private void toolStripButton7_Click_1(object sender, EventArgs e)
@@ -689,6 +649,33 @@ namespace BitmapPad
         {
             pictureBox1.BackColor = BackColor = Color.Black;
         }
+
+        public class ColorInfo
+        {
+            public Vec3b Color;
+            public int Frequency;
+        }
+
+        public ColorInfo[] GetColorsInfo(Mat image)
+        {
+            Dictionary<string, ColorInfo> dic = new Dictionary<string, ColorInfo>();
+            for (int y = 0; y < image.Rows; y++)
+            {
+                for (int x = 0; x < image.Cols; x++)
+                {
+                    Vec3b pixel = image.Get<Vec3b>(y, x);
+                    var key = $"{pixel.Item0};{pixel.Item1};{pixel.Item2}";
+                    if (!dic.ContainsKey(key))
+                    {
+                        dic.Add(key, new ColorInfo() { Color = pixel });
+                    }
+                    var fr = dic[key];
+                    fr.Frequency++;
+                }
+            }
+            return dic.Values.ToArray();
+        }
+
         public static Scalar[] FindDominantColors(Mat image, int k)
         {
             // 1. Convert to a suitable color space (e.g., HSV)
@@ -770,10 +757,15 @@ namespace BitmapPad
 
         private void kmeansToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            Mat matToDispose = null;
+            Mat targetImage = image;
             if (image.Channels() == 4)
             {
-                MessageBox.Show("only 24 bit images allowed");
-                return;
+                if (MessageBox.Show("Only 24 bit images allowed. Remove alpha channel?", Text, MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                    return;
+
+                targetImage = matToDispose = RemoveAlpha(image);
+
             }
             var d = AutoDialog.DialogHelpers.StartDialog();
             d.AddIntegerNumericField("k", "K", 8, 12, 2);// Desired number of clusters (colors)
@@ -797,9 +789,9 @@ compactness,labels,centers = cv.kmeans(z,2,None,criteria,10,flags)
              */  // Reshape the image to a 2D array of pixels (Mx3 for an RGB image)
                  // Each row is a pixel, and columns are R, G, B values.
 
-          
-            
-            using (Mat samples = image.Reshape(1, image.Rows * image.Cols))
+
+
+            using (Mat samples = targetImage.Reshape(1, targetImage.Rows * targetImage.Cols))
             {
                 // Convert to float32 for KMeans
                 samples.ConvertTo(samples, MatType.CV_32F);
@@ -816,18 +808,20 @@ compactness,labels,centers = cv.kmeans(z,2,None,criteria,10,flags)
                     centers.ConvertTo(centers, MatType.CV_8U);
 
                     // Map labels back to the corresponding center colors
-                    Mat result = new Mat(image.Size(), image.Type());
+                    Mat result = new Mat(targetImage.Size(), targetImage.Type());
 
                     for (int i = 0; i < samples.Rows; i++)
                     {
                         int label = bestLabels.Get<int>(i);
                         Vec3b color = centers.Get<Vec3b>(label);
-                        result.Set<Vec3b>(i / image.Cols, i % image.Cols, color);
+                        result.Set<Vec3b>(i / targetImage.Cols, i % targetImage.Cols, color);
                     }
                     SpawnChild(result);
 
                 }
             }
+
+            matToDispose?.Dispose();
         }
 
         private void toDominantColorsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -848,6 +842,165 @@ compactness,labels,centers = cv.kmeans(z,2,None,criteria,10,flags)
             var dominants = FindDominantColors(image, K);
             var result = QuantizeToCustomPalette(image, dominants.Select(z => new Vec3b((byte)z.Val0, (byte)z.Val1, (byte)z.Val2)).ToList());
             SpawnChild(result);
+        }
+
+        private void generalToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show($"Resolution: {image.Size()}{Environment.NewLine}Channels: {image.Channels()}{Environment.NewLine}Aspect: {Math.Round((double)image.Width / image.Height, 4)}");
+
+        }
+
+        private void colorsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var colors = GetColorsInfo(image).OrderByDescending(z => z.Frequency);
+            Form f = new Form();
+            ListView lv = new ListView() { FullRowSelect = true, GridLines = true, View = View.Details };
+            lv.Columns.Add("R", 60);
+            lv.Columns.Add("G", 60);
+            lv.Columns.Add("B", 60);
+            lv.Columns.Add("Freq", 255);
+            lv.Dock = DockStyle.Fill;
+            f.Controls.Add(lv);
+            foreach (var item in colors)
+            {
+                lv.Items.Add(new ListViewItem([
+                    item.Color.Item2.ToString(),
+                    item.Color.Item1.ToString(),
+                    item.Color.Item0.ToString(),
+                    item.Frequency.ToString(),
+                ])
+                { Tag = item });
+            }
+            f.MdiParent = MdiParent;
+            f.Show();
+        }
+
+        private void rangeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var d = AutoDialog.DialogHelpers.StartDialog();
+            //InRangeS(imgHSV, cvScalar(20, 100, 100), cvScalar(30, 255, 255), imgThreshed)
+            d.AddNumericField("r1", "red min", 20);
+            d.AddNumericField("g1", "green min", 100);
+            d.AddNumericField("b1", "blue min", 100);
+            d.AddNumericField("r2", "red max", 30);
+            d.AddNumericField("g2", "green max", 255);
+            d.AddNumericField("b2", "blue max", 255);
+            d.AddBoolField("hsv", "HSV");
+            if (!d.ShowDialog())
+                return;
+
+            Mat temp = null;
+            Mat res = null;
+            if (d.GetBoolField("hsv"))
+            {
+                temp = image.CvtColor(ColorConversionCodes.BGR2HSV);
+                res = temp.InRange(new Scalar(d.GetNumericField("r1"),
+             d.GetNumericField("g1"),
+             d.GetNumericField("b1")),
+             new Scalar(d.GetNumericField("r2"),
+             d.GetNumericField("g2"), d.GetNumericField("b2")));
+            }
+            else
+            {
+                temp = image.Clone();
+                res = temp.InRange(new Scalar(d.GetNumericField("b1"),
+             d.GetNumericField("g1"),
+             d.GetNumericField("r1")),
+             new Scalar(d.GetNumericField("b2"),
+             d.GetNumericField("g2"), d.GetNumericField("r2")));
+            }
+
+
+
+            SpawnChild(res);
+        }
+
+        private void replaceColorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var d = DialogHelpers.StartDialog();
+            d.Text = "Target color";
+            d.AddIntegerNumericField("r", "R", max: 255);
+            d.AddIntegerNumericField("g", "G", max: 255);
+            d.AddIntegerNumericField("b", "B", max: 255);
+
+            if (!d.ShowDialog())
+                return;
+            var r = (byte)d.GetIntegerNumericField("r");
+            var g = (byte)d.GetIntegerNumericField("g");
+            var b = (byte)d.GetIntegerNumericField("b");
+
+            d = DialogHelpers.StartDialog();
+            d.Text = "New color";
+            d.AddIntegerNumericField("r", "R", max: 255);
+            d.AddIntegerNumericField("g", "G", max: 255);
+            d.AddIntegerNumericField("b", "B", max: 255);
+
+            if (!d.ShowDialog())
+                return;
+
+            var r2 = (byte)d.GetIntegerNumericField("r");
+            var g2 = (byte)d.GetIntegerNumericField("g");
+            var b2 = (byte)d.GetIntegerNumericField("b");
+            Mat clone = image.Clone();
+            for (int y = 0; y < image.Rows; y++)
+            {
+                for (int x = 0; x < image.Cols; x++)
+                {
+                    Vec3b pixel = image.Get<Vec3b>(y, x);
+                    if (pixel.Item2 == r && pixel.Item1 == g && pixel.Item0 == b)
+                    {
+                        clone.Set<Vec3b>(y, x, new Vec3b(b2, g2, r2));
+                    }
+                }
+            }
+            SpawnChild(clone);
+        }
+
+        private void binarizeWithDominantToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            var clrs = GetColorsInfo(image);
+            if (clrs.Length != 2)
+            {
+                ShowError("More than 2 colors detected.");
+                return;
+            }
+            var d = DialogHelpers.StartDialog();
+
+            d.AddBoolField("inverse", "Inverse");
+
+            if (!d.ShowDialog())
+                return;
+
+            var inverse = d.GetBoolField("inverse");
+
+            var colorToMatch = clrs[0].Color;
+            var r = colorToMatch.Item2;
+            var g = colorToMatch.Item1;
+            var b = colorToMatch.Item0;
+
+            Mat clone = image.Clone();
+            for (int y = 0; y < image.Rows; y++)
+            {
+                for (int x = 0; x < image.Cols; x++)
+                {
+                    Vec3b pixel = image.Get<Vec3b>(y, x);
+                    if (pixel.Item2 == r && pixel.Item1 == g && pixel.Item0 == b)
+                    {
+                        clone.Set<Vec3b>(y, x, new Vec3b(252, 255, 255));
+                    }
+                    else
+                    {
+                        clone.Set<Vec3b>(y, x, new Vec3b(0, 0, 0));
+
+                    }
+                }
+            }
+            SpawnChild(clone);
+        }
+
+        private void ShowError(string v)
+        {
+            MessageBox.Show(v, Text, MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 }
