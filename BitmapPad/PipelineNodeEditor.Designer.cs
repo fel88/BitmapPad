@@ -35,6 +35,10 @@
             button5 = new Button();
             button6 = new Button();
             button7 = new Button();
+            statusStrip1 = new StatusStrip();
+            toolStripStatusLabel1 = new ToolStripStatusLabel();
+            button8 = new Button();
+            statusStrip1.SuspendLayout();
             SuspendLayout();
             // 
             // button1
@@ -106,11 +110,38 @@
             button7.UseVisualStyleBackColor = true;
             button7.Click += button7_Click;
             // 
+            // statusStrip1
+            // 
+            statusStrip1.Items.AddRange(new ToolStripItem[] { toolStripStatusLabel1 });
+            statusStrip1.Location = new Point(0, 428);
+            statusStrip1.Name = "statusStrip1";
+            statusStrip1.Size = new Size(800, 22);
+            statusStrip1.TabIndex = 7;
+            statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripStatusLabel1
+            // 
+            toolStripStatusLabel1.Name = "toolStripStatusLabel1";
+            toolStripStatusLabel1.Size = new Size(118, 17);
+            toolStripStatusLabel1.Text = "toolStripStatusLabel1";
+            // 
+            // button8
+            // 
+            button8.Location = new Point(393, 152);
+            button8.Name = "button8";
+            button8.Size = new Size(143, 23);
+            button8.TabIndex = 8;
+            button8.Text = "template matching";
+            button8.UseVisualStyleBackColor = true;
+            button8.Click += button8_Click;
+            // 
             // PipelineNodeEditor
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 450);
+            Controls.Add(button8);
+            Controls.Add(statusStrip1);
             Controls.Add(button7);
             Controls.Add(button6);
             Controls.Add(button5);
@@ -120,7 +151,10 @@
             Controls.Add(button1);
             Name = "PipelineNodeEditor";
             Text = "PipelineNodeEditor (experimental)";
+            statusStrip1.ResumeLayout(false);
+            statusStrip1.PerformLayout();
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -132,5 +166,8 @@
         private Button button5;
         private Button button6;
         private Button button7;
+        private StatusStrip statusStrip1;
+        private ToolStripStatusLabel toolStripStatusLabel1;
+        private Button button8;
     }
 }
