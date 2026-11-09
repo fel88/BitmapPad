@@ -38,10 +38,10 @@
             toolStripDropDownButton2 = new ToolStripDropDownButton();
             fileToolStripMenuItem = new ToolStripMenuItem();
             clipboardToolStripMenuItem = new ToolStripMenuItem();
-            toolStripDropDownButton3 = new ToolStripDropDownButton();
-            screenshotToolStripMenuItem = new ToolStripMenuItem();
             toolStripButton1 = new ToolStripDropDownButton();
             newToolStripMenuItem = new ToolStripMenuItem();
+            toolStripDropDownButton3 = new ToolStripDropDownButton();
+            screenshotToolStripMenuItem = new ToolStripMenuItem();
             toolStrip1.SuspendLayout();
             SuspendLayout();
             // 
@@ -51,7 +51,7 @@
             toolStrip1.Items.AddRange(new ToolStripItem[] { toolStripDropDownButton1, toolStripDropDownButton2, toolStripButton1, toolStripDropDownButton3 });
             toolStrip1.Location = new Point(0, 0);
             toolStrip1.Name = "toolStrip1";
-            toolStrip1.Size = new Size(1000, 27);
+            toolStrip1.Size = new Size(1184, 27);
             toolStrip1.TabIndex = 1;
             toolStrip1.Text = "toolStrip1";
             // 
@@ -119,6 +119,22 @@
             clipboardToolStripMenuItem.Text = "Clipboard";
             clipboardToolStripMenuItem.Click += clipboardToolStripMenuItem_Click;
             // 
+            // toolStripButton1
+            // 
+            toolStripButton1.DropDownItems.AddRange(new ToolStripItem[] { newToolStripMenuItem });
+            toolStripButton1.Image = Properties.Resources.category;
+            toolStripButton1.ImageTransparentColor = Color.Magenta;
+            toolStripButton1.Name = "toolStripButton1";
+            toolStripButton1.Size = new Size(82, 24);
+            toolStripButton1.Text = "Pipeline";
+            // 
+            // newToolStripMenuItem
+            // 
+            newToolStripMenuItem.Name = "newToolStripMenuItem";
+            newToolStripMenuItem.Size = new Size(98, 22);
+            newToolStripMenuItem.Text = "New";
+            newToolStripMenuItem.Click += newToolStripMenuItem_Click;
+            // 
             // toolStripDropDownButton3
             // 
             toolStripDropDownButton3.DropDownItems.AddRange(new ToolStripItem[] { screenshotToolStripMenuItem });
@@ -135,28 +151,12 @@
             screenshotToolStripMenuItem.Text = "screenshot";
             screenshotToolStripMenuItem.Click += screenshotToolStripMenuItem_Click;
             // 
-            // toolStripButton1
-            // 
-            toolStripButton1.DropDownItems.AddRange(new ToolStripItem[] { newToolStripMenuItem });
-            toolStripButton1.Image = Properties.Resources.category;
-            toolStripButton1.ImageTransparentColor = Color.Magenta;
-            toolStripButton1.Name = "toolStripButton1";
-            toolStripButton1.Size = new Size(82, 24);
-            toolStripButton1.Text = "Pipeline";
-            // 
-            // newToolStripMenuItem
-            // 
-            newToolStripMenuItem.Name = "newToolStripMenuItem";
-            newToolStripMenuItem.Size = new Size(180, 22);
-            newToolStripMenuItem.Text = "New";
-            newToolStripMenuItem.Click += newToolStripMenuItem_Click;
-            // 
             // mdi
             // 
             AllowDrop = true;
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1000, 486);
+            ClientSize = new Size(1184, 761);
             Controls.Add(toolStrip1);
             IsMdiContainer = true;
             Margin = new Padding(3, 2, 3, 2);

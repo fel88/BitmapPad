@@ -331,15 +331,16 @@ namespace BitmapPad
         private void resizeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var d = DialogHelpers.StartDialog();
-            d.AddNumericField("w", "Width", image.Width, 10000, 1, 0);
-            d.AddNumericField("h", "Height", image.Height, 10000, 1, 0);
+            d.AddDouble("w", "Width", image.Width, 1, 10000, 0);
+            d.AddDouble("h", "Height", image.Height, 1, 10000, 0);
             d.AddOptionsField("mode", "Interpolation", Enum.GetNames(typeof(InterpolationFlags)), Enum.GetName(typeof(InterpolationFlags), InterpolationFlags.Linear));
+
             if (!d.ShowDialog())
                 return;
 
             var mode = d.GetOptionsField("mode");
             var ff = (InterpolationFlags)Enum.Parse(typeof(InterpolationFlags), mode);
-            SpawnChild(image.Resize(new OpenCvSharp.Size(d.GetNumericField("w"), d.GetNumericField("h")), interpolation: ff));
+            SpawnChild(image.Resize(new OpenCvSharp.Size(d.GetDouble("w"), d.GetDouble("h")), interpolation: ff));
         }
 
         private void cropWhiteToolStripMenuItem_Click(object sender, EventArgs e)
@@ -531,17 +532,17 @@ namespace BitmapPad
         private void customToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var d = DialogHelpers.StartDialog();
-            d.AddNumericField("top", "Top", 0, image.Height - 1, 0, 0);
-            d.AddNumericField("bottom", "Bottom", 0, image.Height - 1, 0, 0);
-            d.AddNumericField("left", "Left", 0, image.Width - 1, 0, 0);
-            d.AddNumericField("right", "Right", 0, image.Width - 1, 0, 0);
+            d.AddInt("top", "Top", 0, 0, image.Height - 1);
+            d.AddInt("bottom", "Bottom", 0, 0, image.Height - 1);
+            d.AddInt("left", "Left", 0, 0, image.Width - 1);
+            d.AddInt("right", "Right", 0, 0, image.Width - 1);
             if (!d.ShowDialog())
                 return;
 
-            var xx = d.GetIntegerNumericField("left");
-            var yy = d.GetIntegerNumericField("top");
-            var ww = image.Width - d.GetIntegerNumericField("right") - xx;
-            var hh = image.Height - d.GetIntegerNumericField("bottom") - yy;
+            var xx = d.GetInt("left");
+            var yy = d.GetInt("top");
+            var ww = image.Width - d.GetInt("right") - xx;
+            var hh = image.Height - d.GetInt("bottom") - yy;
             var crop = new Mat(image, new Rect(xx, yy, ww, hh));
             SpawnChild(crop);
         }
@@ -549,7 +550,7 @@ namespace BitmapPad
         private void blurToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var d = DialogHelpers.StartDialog();
-            d.AddNumericField("s", "Size", 5);
+            d.AddDouble("s", "Size", 5);
             if (!d.ShowDialog())
                 return;
 
@@ -559,9 +560,9 @@ namespace BitmapPad
         private void bniarizeToolStripMenuItem_Click(object sender, EventArgs e)
         {
             var d = DialogHelpers.StartDialog();
-            d.AddNumericField("min", "Minimum", 128);
-            d.AddNumericField("max", "Maximum", 255);
-            d.AddBoolField("otsu", "Otsu");
+            d.AddDouble("min", "Minimum", 128);
+            d.AddDouble("max", "Maximum", 255);
+            d.AddBool("otsu", "Otsu");
 
             if (!d.ShowDialog())
                 return;
@@ -763,16 +764,16 @@ namespace BitmapPad
 
             }
             var d = AutoDialog.DialogHelpers.StartDialog();
-            d.AddIntegerNumericField("k", "K", 8, 12, 2);// Desired number of clusters (colors)
-            d.AddIntegerNumericField("maxCount", "maxCount", 10, 200, 1);
-            d.AddNumericField("eps", "eps", 1.0, 10, 0.01m);
+            d.AddInt("k", "K", 8, 12, 2);// Desired number of clusters (colors)
+            d.AddInt("maxCount", "maxCount", 10, 1, 200);
+            d.AddDouble("eps", "eps", 1.0, 0.01m, 10);
             d.AddOptionsField("flags", "Flags", Enum.GetNames<KMeansFlags>(), 0);
             if (!d.ShowDialog())
                 return;
 
-            int K = d.GetIntegerNumericField("k");
-            var eps = d.GetNumericField("eps");
-            var maxCount = d.GetIntegerNumericField("maxCount");
+            int K = d.GetInt("k");
+            var eps = d.GetDouble("eps");
+            var maxCount = d.GetInt("maxCount");
             var flags = Enum.GetValues<KMeansFlags>()[d.GetOptionsFieldIdx("flags")];
             /*
              * # Define criteria = ( type, max_iter = 10 , epsilon = 1.0 )
@@ -827,12 +828,12 @@ compactness,labels,centers = cv.kmeans(z,2,None,criteria,10,flags)
                 return;
             }
             var d = AutoDialog.DialogHelpers.StartDialog();
-            d.AddIntegerNumericField("k", "K", 8, 12, 2);// Desired number of clusters (colors)
+            d.AddInt("k", "K", 8, 12, 2);// Desired number of clusters (colors)
 
             if (!d.ShowDialog())
                 return;
 
-            int K = d.GetIntegerNumericField("k");
+            int K = d.GetInt("k");
 
             var dominants = FindDominantColors(image, K);
             var result = QuantizeToCustomPalette(image, dominants.Select(z => new Vec3b((byte)z.Val0, (byte)z.Val1, (byte)z.Val2)).ToList());
@@ -874,13 +875,13 @@ compactness,labels,centers = cv.kmeans(z,2,None,criteria,10,flags)
         {
             var d = AutoDialog.DialogHelpers.StartDialog();
             //InRangeS(imgHSV, cvScalar(20, 100, 100), cvScalar(30, 255, 255), imgThreshed)
-            d.AddNumericField("r1", "red min", 20);
-            d.AddNumericField("g1", "green min", 100);
-            d.AddNumericField("b1", "blue min", 100);
-            d.AddNumericField("r2", "red max", 30);
-            d.AddNumericField("g2", "green max", 255);
-            d.AddNumericField("b2", "blue max", 255);
-            d.AddBoolField("hsv", "HSV");
+            d.AddDouble("r1", "red min", 20);
+            d.AddDouble("g1", "green min", 100);
+            d.AddDouble("b1", "blue min", 100);
+            d.AddDouble("r2", "red max", 30);
+            d.AddDouble("g2", "green max", 255);
+            d.AddDouble("b2", "blue max", 255);
+            d.AddBool("hsv", "HSV");
             if (!d.ShowDialog())
                 return;
 
@@ -889,20 +890,20 @@ compactness,labels,centers = cv.kmeans(z,2,None,criteria,10,flags)
             if (d.GetBoolField("hsv"))
             {
                 temp = image.CvtColor(ColorConversionCodes.BGR2HSV);
-                res = temp.InRange(new Scalar(d.GetNumericField("r1"),
-             d.GetNumericField("g1"),
-             d.GetNumericField("b1")),
-             new Scalar(d.GetNumericField("r2"),
-             d.GetNumericField("g2"), d.GetNumericField("b2")));
+                res = temp.InRange(new Scalar(d.GetDouble("r1"),
+             d.GetDouble("g1"),
+             d.GetDouble("b1")),
+             new Scalar(d.GetDouble("r2"),
+             d.GetDouble("g2"), d.GetDouble("b2")));
             }
             else
             {
                 temp = image.Clone();
-                res = temp.InRange(new Scalar(d.GetNumericField("b1"),
-             d.GetNumericField("g1"),
-             d.GetNumericField("r1")),
-             new Scalar(d.GetNumericField("b2"),
-             d.GetNumericField("g2"), d.GetNumericField("r2")));
+                res = temp.InRange(new Scalar(d.GetDouble("b1"),
+             d.GetDouble("g1"),
+             d.GetDouble("r1")),
+             new Scalar(d.GetDouble("b2"),
+             d.GetDouble("g2"), d.GetDouble("r2")));
             }
 
 
@@ -914,28 +915,28 @@ compactness,labels,centers = cv.kmeans(z,2,None,criteria,10,flags)
         {
             var d = DialogHelpers.StartDialog();
             d.Text = "Target color";
-            d.AddIntegerNumericField("r", "R", max: 255);
-            d.AddIntegerNumericField("g", "G", max: 255);
-            d.AddIntegerNumericField("b", "B", max: 255);
+            d.AddInt("r", "R", max: 255);
+            d.AddInt("g", "G", max: 255);
+            d.AddInt("b", "B", max: 255);
 
             if (!d.ShowDialog())
                 return;
-            var r = (byte)d.GetIntegerNumericField("r");
-            var g = (byte)d.GetIntegerNumericField("g");
-            var b = (byte)d.GetIntegerNumericField("b");
+            var r = (byte)d.GetInt("r");
+            var g = (byte)d.GetInt("g");
+            var b = (byte)d.GetInt("b");
 
             d = DialogHelpers.StartDialog();
             d.Text = "New color";
-            d.AddIntegerNumericField("r", "R", max: 255);
-            d.AddIntegerNumericField("g", "G", max: 255);
-            d.AddIntegerNumericField("b", "B", max: 255);
+            d.AddInt("r", "R", max: 255);
+            d.AddInt("g", "G", max: 255);
+            d.AddInt("b", "B", max: 255);
 
             if (!d.ShowDialog())
                 return;
 
-            var r2 = (byte)d.GetIntegerNumericField("r");
-            var g2 = (byte)d.GetIntegerNumericField("g");
-            var b2 = (byte)d.GetIntegerNumericField("b");
+            var r2 = (byte)d.GetInt("r");
+            var g2 = (byte)d.GetInt("g");
+            var b2 = (byte)d.GetInt("b");
             Mat clone = image.Clone();
             for (int y = 0; y < image.Rows; y++)
             {
@@ -961,7 +962,7 @@ compactness,labels,centers = cv.kmeans(z,2,None,criteria,10,flags)
             }
             var d = DialogHelpers.StartDialog();
 
-            d.AddBoolField("inverse", "Inverse");
+            d.AddBool("inverse", "Inverse");
 
             if (!d.ShowDialog())
                 return;
@@ -1021,11 +1022,11 @@ compactness,labels,centers = cv.kmeans(z,2,None,criteria,10,flags)
             double brightness_value = 50;
 
             var d = DialogHelpers.StartDialog();
-            d.AddNumericField("value", "Value", brightness_value);
+            d.AddDouble("value", "Value", brightness_value);
             if (!d.ShowDialog())
                 return;
 
-            brightness_value = d.GetNumericField("value");
+            brightness_value = d.GetDouble("value");
 
             //# Adjust brightness using cv2.convertScaleAbs()
             //# alpha=1.0 for no contrast change, beta=brightness_value for brightness adjustment
@@ -1047,9 +1048,9 @@ compactness,labels,centers = cv.kmeans(z,2,None,criteria,10,flags)
 
         private void erodeToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Mat dest = new Mat(); 
+            Mat dest = new Mat();
             OpenCvSharp.Size kernelSize = new OpenCvSharp.Size(3, 3);
-            Scalar fillValue = new Scalar (1);
+            Scalar fillValue = new Scalar(1);
             Mat kernel = new Mat(kernelSize, MatType.CV_16SC1, fillValue);
             OpenCvSharp.InputArray kernelArr = OpenCvSharp.InputArray.Create(kernel);
 
